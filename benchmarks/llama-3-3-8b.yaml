@@ -1,0 +1,40 @@
+# ==============================================================================
+# VLLM Automated Benchmark Configuration (Single Server, Multi-Client)
+# ==============================================================================
+
+server_config:
+  # The complete set of default arguments for the server.
+  server_args: >
+    --model "facebook/opt-125m"
+    --tensor-parallel-size 1
+    --gpu-memory-utilization 0.95
+    --max-num-seqs 512
+  # --enforce-eager
+  # --distributed-executor-backend ray
+
+client_runs:
+  - name: "Llama-3-3-8b - 256 / 256"
+    client_args: >
+      --model "meta-llama/Llama-3.3-70B-Instruct"
+      --throughput-test-prompts 1000
+      --latency-test-prompts 10
+      --max-input-length 256
+      --max-output-length 256
+
+  - name: "Llama-3-3-8b - 1000 / 1000"
+    client_args: >
+      --model "meta-llama/Llama-3.3-70B-Instruct"
+      --throughput-test-prompts 1000
+      --latency-test-prompts 10
+      --max-input-length 1000
+      --max-output-length 1000
+  
+  # - name: "Llama-3-3-8b - 5000 / 5000"
+  #   client_args: >
+  #     --model "meta-llama/Llama-3.3-70B-Instruct"
+  #     --throughput-test-prompts 200
+  #     --latency-test-prompts 5
+  #     --concurrency 100
+  #     --max-input-length 5000
+  #     --max-output-length 5000
+  #     --request-timeout 300

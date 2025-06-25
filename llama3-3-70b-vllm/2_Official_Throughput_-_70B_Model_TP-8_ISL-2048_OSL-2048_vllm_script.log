@@ -1,0 +1,431 @@
+--- STDOUT ---
+INFO 06-24 22:52:41 [__init__.py:244] Automatically detected platform cuda.
+When dataset path is not set, it will default to random dataset
+Namespace(backend='vllm', dataset_name='random', dataset=None, dataset_path=None, input_len=2048, output_len=2048, n=1, num_prompts=500, hf_max_batch_size=None, output_json=None, async_engine=False, disable_frontend_multiprocessing=False, disable_detokenize=False, lora_path=None, prefix_len=None, random_range_ratio=None, hf_subset=None, hf_split=None, model='meta-llama/Llama-3.3-70B-Instruct', task='auto', tokenizer='meta-llama/Llama-3.3-70B-Instruct', tokenizer_mode='auto', trust_remote_code=False, dtype='auto', seed=0, hf_config_path=None, allowed_local_media_path='', revision=None, code_revision=None, rope_scaling={}, rope_theta=None, tokenizer_revision=None, max_model_len=4096, quantization=None, enforce_eager=False, max_seq_len_to_capture=8192, max_logprobs=20, disable_sliding_window=False, disable_cascade_attn=False, skip_tokenizer_init=False, enable_prompt_embeds=False, served_model_name=None, disable_async_output_proc=False, config_format='auto', hf_token=None, hf_overrides={}, override_neuron_config={}, override_pooler_config=None, logits_processor_pattern=None, generation_config='auto', override_generation_config={}, enable_sleep_mode=False, model_impl='auto', load_format='auto', download_dir=None, model_loader_extra_config={}, ignore_patterns=None, use_tqdm_on_load=True, qlora_adapter_name_or_path=None, pt_load_map_location='cpu', guided_decoding_backend='auto', guided_decoding_disable_fallback=False, guided_decoding_disable_any_whitespace=False, guided_decoding_disable_additional_properties=False, enable_reasoning=None, reasoning_parser='', distributed_executor_backend=None, pipeline_parallel_size=1, tensor_parallel_size=8, data_parallel_size=1, data_parallel_size_local=None, data_parallel_address=None, data_parallel_rpc_port=None, data_parallel_backend='mp', enable_expert_parallel=False, max_parallel_loading_workers=None, ray_workers_use_nsight=False, disable_custom_all_reduce=False, worker_cls='auto', worker_extension_cls='', enable_multimodal_encoder_data_parallel=False, block_size=None, gpu_memory_utilization=0.9, swap_space=4, kv_cache_dtype='auto', num_gpu_blocks_override=None, enable_prefix_caching=None, prefix_caching_hash_algo='builtin', cpu_offload_gb=0, calculate_kv_scales=False, tokenizer_pool_size=0, tokenizer_pool_type='ray', tokenizer_pool_extra_config={}, limit_mm_per_prompt={}, mm_processor_kwargs=None, disable_mm_preprocessor_cache=False, enable_lora=None, enable_lora_bias=False, max_loras=1, max_lora_rank=16, lora_extra_vocab_size=256, lora_dtype='auto', long_lora_scaling_factors=None, max_cpu_loras=None, fully_sharded_loras=False, enable_prompt_adapter=None, max_prompt_adapters=1, max_prompt_adapter_token=0, device='auto', speculative_config=None, show_hidden_metrics_for_version=None, otlp_traces_endpoint=None, collect_detailed_traces=None, max_num_batched_tokens=None, max_num_seqs=None, max_num_partial_prefills=1, max_long_partial_prefills=1, cuda_graph_sizes=[512], long_prefill_token_threshold=0, num_lookahead_slots=0, scheduler_delay_factor=0.0, preemption_mode=None, num_scheduler_steps=1, multi_step_stream_outputs=True, scheduling_policy='fcfs', enable_chunked_prefill=None, disable_chunked_mm_input=False, scheduler_cls='vllm.core.scheduler.Scheduler', disable_hybrid_kv_cache_manager=False, kv_transfer_config=None, kv_events_config=None, compilation_config={"level":0,"debug_dump_path":"","cache_dir":"","backend":"","custom_ops":[],"splitting_ops":[],"use_inductor":true,"compile_sizes":null,"inductor_compile_config":{"enable_auto_functionalized_v2":false},"inductor_passes":{},"use_cudagraph":true,"cudagraph_num_of_warmups":0,"cudagraph_capture_sizes":null,"cudagraph_copy_inputs":false,"full_cuda_graph":false,"max_capture_size":null,"local_cache_dir":null}, additional_config={}, use_v2_block_manager=True, disable_log_stats=False, disable_log_requests=False)
+INFO 06-24 22:52:52 [config.py:823] This model supports multiple tasks: {'classify', 'generate', 'embed', 'reward', 'score'}. Defaulting to 'generate'.
+INFO 06-24 22:52:52 [config.py:1946] Defaulting to use mp for distributed inference
+INFO 06-24 22:52:52 [config.py:2195] Chunked prefill is enabled with max_num_batched_tokens=16384.
+INFO 06-24 22:52:53 [core.py:455] Waiting for init message from front-end.
+INFO 06-24 22:52:53 [core.py:70] Initializing a V1 LLM engine (v0.9.1) with config: model='meta-llama/Llama-3.3-70B-Instruct', speculative_config=None, tokenizer='meta-llama/Llama-3.3-70B-Instruct', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, override_neuron_config={}, tokenizer_revision=None, trust_remote_code=False, dtype=torch.bfloat16, max_seq_len=4096, download_dir=None, load_format=LoadFormat.AUTO, tensor_parallel_size=8, pipeline_parallel_size=1, disable_custom_all_reduce=False, quantization=None, enforce_eager=False, kv_cache_dtype=auto,  device_config=cuda, decoding_config=DecodingConfig(backend='auto', disable_fallback=False, disable_any_whitespace=False, disable_additional_properties=False, reasoning_backend=''), observability_config=ObservabilityConfig(show_hidden_metrics_for_version=None, otlp_traces_endpoint=None, collect_detailed_traces=None), seed=0, served_model_name=meta-llama/Llama-3.3-70B-Instruct, num_scheduler_steps=1, multi_step_stream_outputs=True, enable_prefix_caching=True, chunked_prefill_enabled=True, use_async_output_proc=True, pooler_config=None, compilation_config={"level":3,"debug_dump_path":"","cache_dir":"","backend":"","custom_ops":["none"],"splitting_ops":["vllm.unified_attention","vllm.unified_attention_with_output"],"use_inductor":true,"compile_sizes":[],"inductor_compile_config":{"enable_auto_functionalized_v2":false},"inductor_passes":{},"use_cudagraph":true,"cudagraph_num_of_warmups":1,"cudagraph_capture_sizes":[512,504,496,488,480,472,464,456,448,440,432,424,416,408,400,392,384,376,368,360,352,344,336,328,320,312,304,296,288,280,272,264,256,248,240,232,224,216,208,200,192,184,176,168,160,152,144,136,128,120,112,104,96,88,80,72,64,56,48,40,32,24,16,8,4,2,1],"cudagraph_copy_inputs":false,"full_cuda_graph":false,"max_capture_size":512,"local_cache_dir":null}
+WARNING 06-24 22:52:53 [multiproc_worker_utils.py:307] Reducing Torch parallelism from 112 threads to 1 to avoid unnecessary CPU contention. Set OMP_NUM_THREADS in the external environment to tune this value as needed.
+INFO 06-24 22:52:53 [shm_broadcast.py:289] vLLM message queue communication handle: Handle(local_reader_ranks=[0, 1, 2, 3, 4, 5, 6, 7], buffer_handle=(8, 16777216, 10, 'psm_80eb34a1'), local_subscribe_addr='ipc:///tmp/e6886603-67dc-438e-aa97-cc33e798ce79', remote_subscribe_addr=None, remote_addr_ipv6=False)
+WARNING 06-24 22:52:53 [utils.py:2737] Methods determine_num_available_blocks,device_config,get_cache_block_size_bytes,initialize_cache not implemented in <vllm.v1.worker.gpu_worker.Worker object at 0x732232413cb0>
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m INFO 06-24 22:52:53 [shm_broadcast.py:289] vLLM message queue communication handle: Handle(local_reader_ranks=[0], buffer_handle=(1, 10485760, 10, 'psm_186398d4'), local_subscribe_addr='ipc:///tmp/38832d73-581b-45cd-9859-83961e429453', remote_subscribe_addr=None, remote_addr_ipv6=False)
+WARNING 06-24 22:52:53 [utils.py:2737] Methods determine_num_available_blocks,device_config,get_cache_block_size_bytes,initialize_cache not implemented in <vllm.v1.worker.gpu_worker.Worker object at 0x732232413800>
+[1;36m(VllmWorker rank=1 pid=376597)[0;0m INFO 06-24 22:52:53 [shm_broadcast.py:289] vLLM message queue communication handle: Handle(local_reader_ranks=[0], buffer_handle=(1, 10485760, 10, 'psm_15cd4704'), local_subscribe_addr='ipc:///tmp/a913c32e-f00c-40bf-8493-86dd650cf3b2', remote_subscribe_addr=None, remote_addr_ipv6=False)
+WARNING 06-24 22:52:53 [utils.py:2737] Methods determine_num_available_blocks,device_config,get_cache_block_size_bytes,initialize_cache not implemented in <vllm.v1.worker.gpu_worker.Worker object at 0x732232413260>
+[1;36m(VllmWorker rank=3 pid=376599)[0;0m INFO 06-24 22:52:53 [shm_broadcast.py:289] vLLM message queue communication handle: Handle(local_reader_ranks=[0], buffer_handle=(1, 10485760, 10, 'psm_d317735e'), local_subscribe_addr='ipc:///tmp/e784eb99-45a6-4e9c-a75b-5d0f9fd08939', remote_subscribe_addr=None, remote_addr_ipv6=False)
+WARNING 06-24 22:52:53 [utils.py:2737] Methods determine_num_available_blocks,device_config,get_cache_block_size_bytes,initialize_cache not implemented in <vllm.v1.worker.gpu_worker.Worker object at 0x732232412de0>
+[1;36m(VllmWorker rank=5 pid=376601)[0;0m INFO 06-24 22:52:53 [shm_broadcast.py:289] vLLM message queue communication handle: Handle(local_reader_ranks=[0], buffer_handle=(1, 10485760, 10, 'psm_c0541b3a'), local_subscribe_addr='ipc:///tmp/d61e5a57-ad99-4734-81d9-564cc14ef21d', remote_subscribe_addr=None, remote_addr_ipv6=False)
+WARNING 06-24 22:52:53 [utils.py:2737] Methods determine_num_available_blocks,device_config,get_cache_block_size_bytes,initialize_cache not implemented in <vllm.v1.worker.gpu_worker.Worker object at 0x732232412cc0>
+WARNING 06-24 22:52:53 [utils.py:2737] Methods determine_num_available_blocks,device_config,get_cache_block_size_bytes,initialize_cache not implemented in <vllm.v1.worker.gpu_worker.Worker object at 0x732232413260>
+WARNING 06-24 22:52:53 [utils.py:2737] Methods determine_num_available_blocks,device_config,get_cache_block_size_bytes,initialize_cache not implemented in <vllm.v1.worker.gpu_worker.Worker object at 0x7323a5fa95b0>
+[1;36m(VllmWorker rank=6 pid=376602)[0;0m INFO 06-24 22:52:53 [shm_broadcast.py:289] vLLM message queue communication handle: Handle(local_reader_ranks=[0], buffer_handle=(1, 10485760, 10, 'psm_179241fe'), local_subscribe_addr='ipc:///tmp/d8708a4f-d984-4f90-9398-ee98f3756317', remote_subscribe_addr=None, remote_addr_ipv6=False)
+[1;36m(VllmWorker rank=4 pid=376600)[0;0m INFO 06-24 22:52:53 [shm_broadcast.py:289] vLLM message queue communication handle: Handle(local_reader_ranks=[0], buffer_handle=(1, 10485760, 10, 'psm_a639062f'), local_subscribe_addr='ipc:///tmp/ccda154c-73ac-434a-86a8-8231491b21c1', remote_subscribe_addr=None, remote_addr_ipv6=False)
+[1;36m(VllmWorker rank=2 pid=376598)[0;0m INFO 06-24 22:52:53 [shm_broadcast.py:289] vLLM message queue communication handle: Handle(local_reader_ranks=[0], buffer_handle=(1, 10485760, 10, 'psm_dcaf0303'), local_subscribe_addr='ipc:///tmp/b77e422d-11bf-4740-b406-ad802e52fbfa', remote_subscribe_addr=None, remote_addr_ipv6=False)
+WARNING 06-24 22:52:53 [utils.py:2737] Methods determine_num_available_blocks,device_config,get_cache_block_size_bytes,initialize_cache not implemented in <vllm.v1.worker.gpu_worker.Worker object at 0x732232412cc0>
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m INFO 06-24 22:52:53 [shm_broadcast.py:289] vLLM message queue communication handle: Handle(local_reader_ranks=[0], buffer_handle=(1, 10485760, 10, 'psm_34b81015'), local_subscribe_addr='ipc:///tmp/9ff00fd3-066a-403b-8884-e9f519511074', remote_subscribe_addr=None, remote_addr_ipv6=False)
+[1;36m(VllmWorker rank=4 pid=376600)[0;0m INFO 06-24 22:53:04 [utils.py:1126] Found nccl from library libnccl.so.2
+[1;36m(VllmWorker rank=4 pid=376600)[0;0m INFO 06-24 22:53:04 [pynccl.py:70] vLLM is using nccl==2.26.2
+[1;36m(VllmWorker rank=6 pid=376602)[0;0m INFO 06-24 22:53:04 [utils.py:1126] Found nccl from library libnccl.so.2
+[1;36m(VllmWorker rank=2 pid=376598)[0;0m INFO 06-24 22:53:04 [utils.py:1126] Found nccl from library libnccl.so.2
+[1;36m(VllmWorker rank=6 pid=376602)[0;0m INFO 06-24 22:53:04 [pynccl.py:70] vLLM is using nccl==2.26.2
+[1;36m(VllmWorker rank=2 pid=376598)[0;0m INFO 06-24 22:53:04 [pynccl.py:70] vLLM is using nccl==2.26.2
+[1;36m(VllmWorker rank=3 pid=376599)[0;0m INFO 06-24 22:53:04 [utils.py:1126] Found nccl from library libnccl.so.2
+[1;36m(VllmWorker rank=3 pid=376599)[0;0m INFO 06-24 22:53:04 [pynccl.py:70] vLLM is using nccl==2.26.2
+[1;36m(VllmWorker rank=5 pid=376601)[0;0m INFO 06-24 22:53:04 [utils.py:1126] Found nccl from library libnccl.so.2
+[1;36m(VllmWorker rank=5 pid=376601)[0;0m INFO 06-24 22:53:04 [pynccl.py:70] vLLM is using nccl==2.26.2
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m INFO 06-24 22:53:04 [utils.py:1126] Found nccl from library libnccl.so.2
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m INFO 06-24 22:53:04 [pynccl.py:70] vLLM is using nccl==2.26.2
+[1;36m(VllmWorker rank=1 pid=376597)[0;0m INFO 06-24 22:53:04 [utils.py:1126] Found nccl from library libnccl.so.2
+[1;36m(VllmWorker rank=1 pid=376597)[0;0m INFO 06-24 22:53:04 [pynccl.py:70] vLLM is using nccl==2.26.2
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m INFO 06-24 22:53:04 [utils.py:1126] Found nccl from library libnccl.so.2
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m INFO 06-24 22:53:04 [pynccl.py:70] vLLM is using nccl==2.26.2
+[1;36m(VllmWorker rank=3 pid=376599)[0;0m INFO 06-24 22:53:37 [custom_all_reduce_utils.py:246] reading GPU P2P access cache from /mnt/disks/mlperf-scratch/gpu_p2p_access_cache_for_0,1,2,3,4,5,6,7.json
+[1;36m(VllmWorker rank=5 pid=376601)[0;0m INFO 06-24 22:53:37 [custom_all_reduce_utils.py:246] reading GPU P2P access cache from /mnt/disks/mlperf-scratch/gpu_p2p_access_cache_for_0,1,2,3,4,5,6,7.json
+[1;36m(VllmWorker rank=1 pid=376597)[0;0m INFO 06-24 22:53:37 [custom_all_reduce_utils.py:246] reading GPU P2P access cache from /mnt/disks/mlperf-scratch/gpu_p2p_access_cache_for_0,1,2,3,4,5,6,7.json
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m INFO 06-24 22:53:37 [custom_all_reduce_utils.py:246] reading GPU P2P access cache from /mnt/disks/mlperf-scratch/gpu_p2p_access_cache_for_0,1,2,3,4,5,6,7.json
+[1;36m(VllmWorker rank=4 pid=376600)[0;0m INFO 06-24 22:53:37 [custom_all_reduce_utils.py:246] reading GPU P2P access cache from /mnt/disks/mlperf-scratch/gpu_p2p_access_cache_for_0,1,2,3,4,5,6,7.json
+[1;36m(VllmWorker rank=2 pid=376598)[0;0m INFO 06-24 22:53:37 [custom_all_reduce_utils.py:246] reading GPU P2P access cache from /mnt/disks/mlperf-scratch/gpu_p2p_access_cache_for_0,1,2,3,4,5,6,7.json
+[1;36m(VllmWorker rank=6 pid=376602)[0;0m INFO 06-24 22:53:37 [custom_all_reduce_utils.py:246] reading GPU P2P access cache from /mnt/disks/mlperf-scratch/gpu_p2p_access_cache_for_0,1,2,3,4,5,6,7.json
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m INFO 06-24 22:53:37 [custom_all_reduce_utils.py:246] reading GPU P2P access cache from /mnt/disks/mlperf-scratch/gpu_p2p_access_cache_for_0,1,2,3,4,5,6,7.json
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m INFO 06-24 22:53:37 [shm_broadcast.py:289] vLLM message queue communication handle: Handle(local_reader_ranks=[1, 2, 3, 4, 5, 6, 7], buffer_handle=(7, 4194304, 6, 'psm_87c8b8a1'), local_subscribe_addr='ipc:///tmp/ce0edac8-ebd2-4111-8a72-7bb80c226f3a', remote_subscribe_addr=None, remote_addr_ipv6=False)
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m INFO 06-24 22:53:37 [parallel_state.py:1065] rank 0 in world size 8 is assigned as DP rank 0, PP rank 0, TP rank 0, EP rank 0
+[1;36m(VllmWorker rank=4 pid=376600)[0;0m INFO 06-24 22:53:37 [parallel_state.py:1065] rank 4 in world size 8 is assigned as DP rank 0, PP rank 0, TP rank 4, EP rank 4
+[1;36m(VllmWorker rank=5 pid=376601)[0;0m INFO 06-24 22:53:37 [parallel_state.py:1065] rank 5 in world size 8 is assigned as DP rank 0, PP rank 0, TP rank 5, EP rank 5
+[1;36m(VllmWorker rank=1 pid=376597)[0;0m INFO 06-24 22:53:37 [parallel_state.py:1065] rank 1 in world size 8 is assigned as DP rank 0, PP rank 0, TP rank 1, EP rank 1
+[1;36m(VllmWorker rank=6 pid=376602)[0;0m INFO 06-24 22:53:37 [parallel_state.py:1065] rank 6 in world size 8 is assigned as DP rank 0, PP rank 0, TP rank 6, EP rank 6
+[1;36m(VllmWorker rank=4 pid=376600)[0;0m WARNING 06-24 22:53:37 [topk_topp_sampler.py:59] FlashInfer is not available. Falling back to the PyTorch-native implementation of top-p & top-k sampling. For the best performance, please install FlashInfer.
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m WARNING 06-24 22:53:37 [topk_topp_sampler.py:59] FlashInfer is not available. Falling back to the PyTorch-native implementation of top-p & top-k sampling. For the best performance, please install FlashInfer.
+[1;36m(VllmWorker rank=6 pid=376602)[0;0m WARNING 06-24 22:53:37 [topk_topp_sampler.py:59] FlashInfer is not available. Falling back to the PyTorch-native implementation of top-p & top-k sampling. For the best performance, please install FlashInfer.
+[1;36m(VllmWorker rank=1 pid=376597)[0;0m WARNING 06-24 22:53:37 [topk_topp_sampler.py:59] FlashInfer is not available. Falling back to the PyTorch-native implementation of top-p & top-k sampling. For the best performance, please install FlashInfer.
+[1;36m(VllmWorker rank=5 pid=376601)[0;0m WARNING 06-24 22:53:37 [topk_topp_sampler.py:59] FlashInfer is not available. Falling back to the PyTorch-native implementation of top-p & top-k sampling. For the best performance, please install FlashInfer.
+[1;36m(VllmWorker rank=4 pid=376600)[0;0m INFO 06-24 22:53:37 [gpu_model_runner.py:1595] Starting to load model meta-llama/Llama-3.3-70B-Instruct...
+[1;36m(VllmWorker rank=6 pid=376602)[0;0m INFO 06-24 22:53:37 [gpu_model_runner.py:1595] Starting to load model meta-llama/Llama-3.3-70B-Instruct...
+[1;36m(VllmWorker rank=5 pid=376601)[0;0m INFO 06-24 22:53:37 [gpu_model_runner.py:1595] Starting to load model meta-llama/Llama-3.3-70B-Instruct...
+[1;36m(VllmWorker rank=1 pid=376597)[0;0m INFO 06-24 22:53:37 [gpu_model_runner.py:1595] Starting to load model meta-llama/Llama-3.3-70B-Instruct...
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m INFO 06-24 22:53:37 [gpu_model_runner.py:1595] Starting to load model meta-llama/Llama-3.3-70B-Instruct...
+[1;36m(VllmWorker rank=2 pid=376598)[0;0m INFO 06-24 22:53:37 [parallel_state.py:1065] rank 2 in world size 8 is assigned as DP rank 0, PP rank 0, TP rank 2, EP rank 2
+[1;36m(VllmWorker rank=3 pid=376599)[0;0m INFO 06-24 22:53:37 [parallel_state.py:1065] rank 3 in world size 8 is assigned as DP rank 0, PP rank 0, TP rank 3, EP rank 3
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m INFO 06-24 22:53:37 [parallel_state.py:1065] rank 7 in world size 8 is assigned as DP rank 0, PP rank 0, TP rank 7, EP rank 7
+[1;36m(VllmWorker rank=2 pid=376598)[0;0m WARNING 06-24 22:53:37 [topk_topp_sampler.py:59] FlashInfer is not available. Falling back to the PyTorch-native implementation of top-p & top-k sampling. For the best performance, please install FlashInfer.
+[1;36m(VllmWorker rank=3 pid=376599)[0;0m WARNING 06-24 22:53:37 [topk_topp_sampler.py:59] FlashInfer is not available. Falling back to the PyTorch-native implementation of top-p & top-k sampling. For the best performance, please install FlashInfer.
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m WARNING 06-24 22:53:37 [topk_topp_sampler.py:59] FlashInfer is not available. Falling back to the PyTorch-native implementation of top-p & top-k sampling. For the best performance, please install FlashInfer.
+[1;36m(VllmWorker rank=2 pid=376598)[0;0m INFO 06-24 22:53:37 [gpu_model_runner.py:1595] Starting to load model meta-llama/Llama-3.3-70B-Instruct...
+[1;36m(VllmWorker rank=3 pid=376599)[0;0m INFO 06-24 22:53:37 [gpu_model_runner.py:1595] Starting to load model meta-llama/Llama-3.3-70B-Instruct...
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m INFO 06-24 22:53:37 [gpu_model_runner.py:1595] Starting to load model meta-llama/Llama-3.3-70B-Instruct...
+[1;36m(VllmWorker rank=3 pid=376599)[0;0m INFO 06-24 22:53:37 [gpu_model_runner.py:1600] Loading model from scratch...
+[1;36m(VllmWorker rank=5 pid=376601)[0;0m INFO 06-24 22:53:37 [gpu_model_runner.py:1600] Loading model from scratch...
+[1;36m(VllmWorker rank=6 pid=376602)[0;0m INFO 06-24 22:53:37 [gpu_model_runner.py:1600] Loading model from scratch...
+[1;36m(VllmWorker rank=4 pid=376600)[0;0m INFO 06-24 22:53:37 [gpu_model_runner.py:1600] Loading model from scratch...
+[1;36m(VllmWorker rank=2 pid=376598)[0;0m INFO 06-24 22:53:37 [gpu_model_runner.py:1600] Loading model from scratch...
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m INFO 06-24 22:53:37 [gpu_model_runner.py:1600] Loading model from scratch...
+[1;36m(VllmWorker rank=3 pid=376599)[0;0m INFO 06-24 22:53:37 [cuda.py:246] FlashInfer failed to import for V1 engine on Blackwell (SM 10.0) GPUs; it is recommended to install FlashInfer for better performance.
+[1;36m(VllmWorker rank=3 pid=376599)[0;0m INFO 06-24 22:53:37 [cuda.py:252] Using Flash Attention backend on V1 engine.
+[1;36m(VllmWorker rank=5 pid=376601)[0;0m INFO 06-24 22:53:37 [cuda.py:246] FlashInfer failed to import for V1 engine on Blackwell (SM 10.0) GPUs; it is recommended to install FlashInfer for better performance.
+[1;36m(VllmWorker rank=5 pid=376601)[0;0m INFO 06-24 22:53:37 [cuda.py:252] Using Flash Attention backend on V1 engine.
+[1;36m(VllmWorker rank=6 pid=376602)[0;0m INFO 06-24 22:53:37 [cuda.py:246] FlashInfer failed to import for V1 engine on Blackwell (SM 10.0) GPUs; it is recommended to install FlashInfer for better performance.
+[1;36m(VllmWorker rank=6 pid=376602)[0;0m INFO 06-24 22:53:37 [cuda.py:252] Using Flash Attention backend on V1 engine.
+[1;36m(VllmWorker rank=4 pid=376600)[0;0m INFO 06-24 22:53:37 [cuda.py:246] FlashInfer failed to import for V1 engine on Blackwell (SM 10.0) GPUs; it is recommended to install FlashInfer for better performance.
+[1;36m(VllmWorker rank=4 pid=376600)[0;0m INFO 06-24 22:53:37 [cuda.py:252] Using Flash Attention backend on V1 engine.
+[1;36m(VllmWorker rank=1 pid=376597)[0;0m INFO 06-24 22:53:37 [gpu_model_runner.py:1600] Loading model from scratch...
+[1;36m(VllmWorker rank=2 pid=376598)[0;0m INFO 06-24 22:53:37 [cuda.py:246] FlashInfer failed to import for V1 engine on Blackwell (SM 10.0) GPUs; it is recommended to install FlashInfer for better performance.
+[1;36m(VllmWorker rank=2 pid=376598)[0;0m INFO 06-24 22:53:37 [cuda.py:252] Using Flash Attention backend on V1 engine.
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m INFO 06-24 22:53:37 [gpu_model_runner.py:1600] Loading model from scratch...
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m INFO 06-24 22:53:37 [cuda.py:246] FlashInfer failed to import for V1 engine on Blackwell (SM 10.0) GPUs; it is recommended to install FlashInfer for better performance.
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m INFO 06-24 22:53:37 [cuda.py:252] Using Flash Attention backend on V1 engine.
+[1;36m(VllmWorker rank=1 pid=376597)[0;0m INFO 06-24 22:53:37 [cuda.py:246] FlashInfer failed to import for V1 engine on Blackwell (SM 10.0) GPUs; it is recommended to install FlashInfer for better performance.
+[1;36m(VllmWorker rank=1 pid=376597)[0;0m INFO 06-24 22:53:37 [cuda.py:252] Using Flash Attention backend on V1 engine.
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m INFO 06-24 22:53:37 [cuda.py:246] FlashInfer failed to import for V1 engine on Blackwell (SM 10.0) GPUs; it is recommended to install FlashInfer for better performance.
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m INFO 06-24 22:53:37 [cuda.py:252] Using Flash Attention backend on V1 engine.
+[1;36m(VllmWorker rank=5 pid=376601)[0;0m INFO 06-24 22:53:38 [weight_utils.py:292] Using model weights format ['*.safetensors']
+[1;36m(VllmWorker rank=3 pid=376599)[0;0m INFO 06-24 22:53:38 [weight_utils.py:292] Using model weights format ['*.safetensors']
+[1;36m(VllmWorker rank=4 pid=376600)[0;0m INFO 06-24 22:53:38 [weight_utils.py:292] Using model weights format ['*.safetensors']
+[1;36m(VllmWorker rank=6 pid=376602)[0;0m INFO 06-24 22:53:38 [weight_utils.py:292] Using model weights format ['*.safetensors']
+[1;36m(VllmWorker rank=2 pid=376598)[0;0m INFO 06-24 22:53:38 [weight_utils.py:292] Using model weights format ['*.safetensors']
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m INFO 06-24 22:53:38 [weight_utils.py:292] Using model weights format ['*.safetensors']
+[1;36m(VllmWorker rank=1 pid=376597)[0;0m INFO 06-24 22:53:38 [weight_utils.py:292] Using model weights format ['*.safetensors']
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m INFO 06-24 22:53:38 [weight_utils.py:292] Using model weights format ['*.safetensors']
+[1;36m(VllmWorker rank=5 pid=376601)[0;0m INFO 06-24 22:53:45 [default_loader.py:272] Loading weights took 7.27 seconds
+[1;36m(VllmWorker rank=6 pid=376602)[0;0m INFO 06-24 22:53:45 [default_loader.py:272] Loading weights took 7.10 seconds
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m INFO 06-24 22:53:45 [default_loader.py:272] Loading weights took 7.24 seconds
+[1;36m(VllmWorker rank=2 pid=376598)[0;0m INFO 06-24 22:53:45 [default_loader.py:272] Loading weights took 7.03 seconds
+[1;36m(VllmWorker rank=5 pid=376601)[0;0m INFO 06-24 22:53:46 [gpu_model_runner.py:1624] Model loading took 16.4607 GiB and 7.998837 seconds
+[1;36m(VllmWorker rank=6 pid=376602)[0;0m INFO 06-24 22:53:46 [gpu_model_runner.py:1624] Model loading took 16.4607 GiB and 8.067018 seconds
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m INFO 06-24 22:53:46 [gpu_model_runner.py:1624] Model loading took 16.4607 GiB and 8.049947 seconds
+[1;36m(VllmWorker rank=4 pid=376600)[0;0m INFO 06-24 22:53:46 [default_loader.py:272] Loading weights took 7.12 seconds
+[1;36m(VllmWorker rank=2 pid=376598)[0;0m INFO 06-24 22:53:46 [gpu_model_runner.py:1624] Model loading took 16.4607 GiB and 8.241532 seconds
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m INFO 06-24 22:53:46 [default_loader.py:272] Loading weights took 7.57 seconds
+[1;36m(VllmWorker rank=4 pid=376600)[0;0m INFO 06-24 22:53:46 [gpu_model_runner.py:1624] Model loading took 16.4607 GiB and 8.515630 seconds
+[1;36m(VllmWorker rank=3 pid=376599)[0;0m INFO 06-24 22:53:46 [default_loader.py:272] Loading weights took 7.43 seconds
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m INFO 06-24 22:53:46 [gpu_model_runner.py:1624] Model loading took 16.4607 GiB and 8.542698 seconds
+[1;36m(VllmWorker rank=1 pid=376597)[0;0m INFO 06-24 22:53:46 [default_loader.py:272] Loading weights took 7.57 seconds
+[1;36m(VllmWorker rank=3 pid=376599)[0;0m INFO 06-24 22:53:46 [gpu_model_runner.py:1624] Model loading took 16.4607 GiB and 8.973629 seconds
+[1;36m(VllmWorker rank=1 pid=376597)[0;0m INFO 06-24 22:53:47 [gpu_model_runner.py:1624] Model loading took 16.4607 GiB and 9.143123 seconds
+[1;36m(VllmWorker rank=1 pid=376597)[0;0m INFO 06-24 22:53:58 [backends.py:462] Using cache directory: /mnt/disks/mlperf-scratch/torch_compile_cache/0e78981a1e/rank_1_0 for vLLM's torch.compile
+[1;36m(VllmWorker rank=1 pid=376597)[0;0m INFO 06-24 22:53:58 [backends.py:472] Dynamo bytecode transform time: 10.92 s
+[1;36m(VllmWorker rank=2 pid=376598)[0;0m INFO 06-24 22:53:58 [backends.py:462] Using cache directory: /mnt/disks/mlperf-scratch/torch_compile_cache/0e78981a1e/rank_2_0 for vLLM's torch.compile
+[1;36m(VllmWorker rank=4 pid=376600)[0;0m INFO 06-24 22:53:58 [backends.py:462] Using cache directory: /mnt/disks/mlperf-scratch/torch_compile_cache/0e78981a1e/rank_4_0 for vLLM's torch.compile
+[1;36m(VllmWorker rank=2 pid=376598)[0;0m INFO 06-24 22:53:58 [backends.py:472] Dynamo bytecode transform time: 10.87 s
+[1;36m(VllmWorker rank=4 pid=376600)[0;0m INFO 06-24 22:53:58 [backends.py:472] Dynamo bytecode transform time: 10.92 s
+[1;36m(VllmWorker rank=5 pid=376601)[0;0m INFO 06-24 22:53:58 [backends.py:462] Using cache directory: /mnt/disks/mlperf-scratch/torch_compile_cache/0e78981a1e/rank_5_0 for vLLM's torch.compile
+[1;36m(VllmWorker rank=3 pid=376599)[0;0m INFO 06-24 22:53:58 [backends.py:462] Using cache directory: /mnt/disks/mlperf-scratch/torch_compile_cache/0e78981a1e/rank_3_0 for vLLM's torch.compile
+[1;36m(VllmWorker rank=5 pid=376601)[0;0m INFO 06-24 22:53:58 [backends.py:472] Dynamo bytecode transform time: 10.89 s
+[1;36m(VllmWorker rank=3 pid=376599)[0;0m INFO 06-24 22:53:58 [backends.py:472] Dynamo bytecode transform time: 10.93 s
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m INFO 06-24 22:53:58 [backends.py:462] Using cache directory: /mnt/disks/mlperf-scratch/torch_compile_cache/0e78981a1e/rank_7_0 for vLLM's torch.compile
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m INFO 06-24 22:53:58 [backends.py:472] Dynamo bytecode transform time: 10.92 s
+[1;36m(VllmWorker rank=6 pid=376602)[0;0m INFO 06-24 22:53:58 [backends.py:462] Using cache directory: /mnt/disks/mlperf-scratch/torch_compile_cache/0e78981a1e/rank_6_0 for vLLM's torch.compile
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m INFO 06-24 22:53:58 [backends.py:462] Using cache directory: /mnt/disks/mlperf-scratch/torch_compile_cache/0e78981a1e/rank_0_0 for vLLM's torch.compile
+[1;36m(VllmWorker rank=6 pid=376602)[0;0m INFO 06-24 22:53:58 [backends.py:472] Dynamo bytecode transform time: 11.07 s
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m INFO 06-24 22:53:58 [backends.py:472] Dynamo bytecode transform time: 11.03 s
+[1;36m(VllmWorker rank=2 pid=376598)[0;0m INFO 06-24 22:54:01 [backends.py:161] Cache the graph of shape None for later use
+[1;36m(VllmWorker rank=4 pid=376600)[0;0m INFO 06-24 22:54:01 [backends.py:161] Cache the graph of shape None for later use
+[1;36m(VllmWorker rank=1 pid=376597)[0;0m INFO 06-24 22:54:01 [backends.py:161] Cache the graph of shape None for later use
+[1;36m(VllmWorker rank=3 pid=376599)[0;0m INFO 06-24 22:54:01 [backends.py:161] Cache the graph of shape None for later use
+[1;36m(VllmWorker rank=5 pid=376601)[0;0m INFO 06-24 22:54:01 [backends.py:161] Cache the graph of shape None for later use
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m INFO 06-24 22:54:01 [backends.py:161] Cache the graph of shape None for later use
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m INFO 06-24 22:54:01 [backends.py:161] Cache the graph of shape None for later use
+[1;36m(VllmWorker rank=6 pid=376602)[0;0m INFO 06-24 22:54:01 [backends.py:161] Cache the graph of shape None for later use
+[1;36m(VllmWorker rank=2 pid=376598)[0;0m INFO 06-24 22:54:37 [backends.py:173] Compiling a graph for general shape takes 38.17 s
+[1;36m(VllmWorker rank=4 pid=376600)[0;0m INFO 06-24 22:54:37 [backends.py:173] Compiling a graph for general shape takes 38.21 s
+[1;36m(VllmWorker rank=5 pid=376601)[0;0m INFO 06-24 22:54:37 [backends.py:173] Compiling a graph for general shape takes 38.16 s
+[1;36m(VllmWorker rank=3 pid=376599)[0;0m INFO 06-24 22:54:37 [backends.py:173] Compiling a graph for general shape takes 38.23 s
+[1;36m(VllmWorker rank=1 pid=376597)[0;0m INFO 06-24 22:54:37 [backends.py:173] Compiling a graph for general shape takes 38.31 s
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m INFO 06-24 22:54:37 [backends.py:173] Compiling a graph for general shape takes 38.13 s
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m INFO 06-24 22:54:37 [backends.py:173] Compiling a graph for general shape takes 38.21 s
+[1;36m(VllmWorker rank=6 pid=376602)[0;0m INFO 06-24 22:54:37 [backends.py:173] Compiling a graph for general shape takes 38.42 s
+[1;36m(VllmWorker rank=3 pid=376599)[0;0m INFO 06-24 22:55:00 [monitor.py:34] torch.compile takes 49.16 s in total
+[1;36m(VllmWorker rank=2 pid=376598)[0;0m INFO 06-24 22:55:00 [monitor.py:34] torch.compile takes 49.04 s in total
+[1;36m(VllmWorker rank=5 pid=376601)[0;0m INFO 06-24 22:55:00 [monitor.py:34] torch.compile takes 49.05 s in total
+[1;36m(VllmWorker rank=6 pid=376602)[0;0m INFO 06-24 22:55:00 [monitor.py:34] torch.compile takes 49.49 s in total
+[1;36m(VllmWorker rank=1 pid=376597)[0;0m INFO 06-24 22:55:00 [monitor.py:34] torch.compile takes 49.22 s in total
+[1;36m(VllmWorker rank=4 pid=376600)[0;0m INFO 06-24 22:55:00 [monitor.py:34] torch.compile takes 49.13 s in total
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m INFO 06-24 22:55:00 [monitor.py:34] torch.compile takes 49.16 s in total
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m INFO 06-24 22:55:00 [monitor.py:34] torch.compile takes 49.13 s in total
+[1;36m(VllmWorker rank=1 pid=376597)[0;0m INFO 06-24 22:55:02 [gpu_worker.py:227] Available KV cache memory: 135.82 GiB
+[1;36m(VllmWorker rank=3 pid=376599)[0;0m INFO 06-24 22:55:02 [gpu_worker.py:227] Available KV cache memory: 135.82 GiB
+[1;36m(VllmWorker rank=2 pid=376598)[0;0m INFO 06-24 22:55:02 [gpu_worker.py:227] Available KV cache memory: 135.82 GiB
+[1;36m(VllmWorker rank=6 pid=376602)[0;0m INFO 06-24 22:55:02 [gpu_worker.py:227] Available KV cache memory: 135.82 GiB
+[1;36m(VllmWorker rank=4 pid=376600)[0;0m INFO 06-24 22:55:02 [gpu_worker.py:227] Available KV cache memory: 135.82 GiB
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m INFO 06-24 22:55:02 [gpu_worker.py:227] Available KV cache memory: 136.45 GiB
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m INFO 06-24 22:55:02 [gpu_worker.py:227] Available KV cache memory: 135.95 GiB
+[1;36m(VllmWorker rank=5 pid=376601)[0;0m INFO 06-24 22:55:03 [gpu_worker.py:227] Available KV cache memory: 135.82 GiB
+INFO 06-24 22:55:03 [kv_cache_utils.py:715] GPU KV cache size: 3,563,712 tokens
+INFO 06-24 22:55:03 [kv_cache_utils.py:719] Maximum concurrency for 4,096 tokens per request: 870.05x
+INFO 06-24 22:55:03 [kv_cache_utils.py:715] GPU KV cache size: 3,560,432 tokens
+INFO 06-24 22:55:03 [kv_cache_utils.py:719] Maximum concurrency for 4,096 tokens per request: 869.25x
+INFO 06-24 22:55:03 [kv_cache_utils.py:715] GPU KV cache size: 3,560,432 tokens
+INFO 06-24 22:55:03 [kv_cache_utils.py:719] Maximum concurrency for 4,096 tokens per request: 869.25x
+INFO 06-24 22:55:03 [kv_cache_utils.py:715] GPU KV cache size: 3,560,432 tokens
+INFO 06-24 22:55:03 [kv_cache_utils.py:719] Maximum concurrency for 4,096 tokens per request: 869.25x
+INFO 06-24 22:55:03 [kv_cache_utils.py:715] GPU KV cache size: 3,560,432 tokens
+INFO 06-24 22:55:03 [kv_cache_utils.py:719] Maximum concurrency for 4,096 tokens per request: 869.25x
+INFO 06-24 22:55:03 [kv_cache_utils.py:715] GPU KV cache size: 3,560,432 tokens
+INFO 06-24 22:55:03 [kv_cache_utils.py:719] Maximum concurrency for 4,096 tokens per request: 869.25x
+INFO 06-24 22:55:03 [kv_cache_utils.py:715] GPU KV cache size: 3,560,432 tokens
+INFO 06-24 22:55:03 [kv_cache_utils.py:719] Maximum concurrency for 4,096 tokens per request: 869.25x
+INFO 06-24 22:55:03 [kv_cache_utils.py:715] GPU KV cache size: 3,576,816 tokens
+INFO 06-24 22:55:03 [kv_cache_utils.py:719] Maximum concurrency for 4,096 tokens per request: 873.25x
+[1;36m(VllmWorker rank=4 pid=376600)[0;0m INFO 06-24 22:55:35 [custom_all_reduce.py:196] Registering 10626 cuda graph addresses
+[1;36m(VllmWorker rank=6 pid=376602)[0;0m INFO 06-24 22:55:35 [custom_all_reduce.py:196] Registering 10626 cuda graph addresses
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m INFO 06-24 22:55:35 [custom_all_reduce.py:196] Registering 10626 cuda graph addresses
+[1;36m(VllmWorker rank=2 pid=376598)[0;0m INFO 06-24 22:55:35 [custom_all_reduce.py:196] Registering 10626 cuda graph addresses
+[1;36m(VllmWorker rank=3 pid=376599)[0;0m INFO 06-24 22:55:35 [custom_all_reduce.py:196] Registering 10626 cuda graph addresses
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m INFO 06-24 22:55:35 [custom_all_reduce.py:196] Registering 10626 cuda graph addresses
+[1;36m(VllmWorker rank=1 pid=376597)[0;0m INFO 06-24 22:55:35 [custom_all_reduce.py:196] Registering 10626 cuda graph addresses
+[1;36m(VllmWorker rank=5 pid=376601)[0;0m INFO 06-24 22:55:36 [custom_all_reduce.py:196] Registering 10626 cuda graph addresses
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m INFO 06-24 22:55:36 [gpu_model_runner.py:2048] Graph capturing finished in 33 secs, took 1.25 GiB
+[1;36m(VllmWorker rank=4 pid=376600)[0;0m INFO 06-24 22:55:36 [gpu_model_runner.py:2048] Graph capturing finished in 33 secs, took 1.25 GiB
+[1;36m(VllmWorker rank=1 pid=376597)[0;0m INFO 06-24 22:55:36 [gpu_model_runner.py:2048] Graph capturing finished in 33 secs, took 1.25 GiB
+[1;36m(VllmWorker rank=6 pid=376602)[0;0m INFO 06-24 22:55:36 [gpu_model_runner.py:2048] Graph capturing finished in 33 secs, took 1.25 GiB
+[1;36m(VllmWorker rank=3 pid=376599)[0;0m INFO 06-24 22:55:36 [gpu_model_runner.py:2048] Graph capturing finished in 33 secs, took 1.25 GiB
+[1;36m(VllmWorker rank=5 pid=376601)[0;0m INFO 06-24 22:55:36 [gpu_model_runner.py:2048] Graph capturing finished in 33 secs, took 1.25 GiB
+[1;36m(VllmWorker rank=2 pid=376598)[0;0m INFO 06-24 22:55:36 [gpu_model_runner.py:2048] Graph capturing finished in 33 secs, took 1.25 GiB
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m INFO 06-24 22:55:36 [gpu_model_runner.py:2048] Graph capturing finished in 33 secs, took 1.25 GiB
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527] WorkerProc hit an exception.
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527] Traceback (most recent call last):
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/v1/executor/multiproc_executor.py", line 522, in worker_busy_loop
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     output = func(*args, **kwargs)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]              ^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/v1/worker/gpu_worker.py", line 272, in compile_or_warm_up_model
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     hidden_states=self.model_runner._dummy_run(
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     return func(*args, **kwargs)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/v1/worker/gpu_model_runner.py", line 1847, in _dummy_run
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     outputs = model(
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]               ^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     return self._call_impl(*args, **kwargs)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     return forward_call(*args, **kwargs)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/model_executor/models/llama.py", line 581, in forward
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     model_output = self.model(input_ids, positions, intermediate_tensors,
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/compilation/decorators.py", line 246, in __call__
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     model_output = self.forward(*args, **kwargs)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/model_executor/models/llama.py", line 368, in forward
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     def forward(
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     return self._call_impl(*args, **kwargs)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     return forward_call(*args, **kwargs)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 838, in _fn
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     return fn(*args, **kwargs)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/fx/graph_module.py", line 830, in call_wrapped
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     return self._wrapped_call(self, *args, **kwargs)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/fx/graph_module.py", line 406, in __call__
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     raise e
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/fx/graph_module.py", line 393, in __call__
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     return super(self.cls, obj).__call__(*args, **kwargs)  # type: ignore[misc]
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     return self._call_impl(*args, **kwargs)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     return forward_call(*args, **kwargs)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "<eval_with_key>.162", line 490, in forward
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     submod_0 = self.submod_0(l_input_ids_, s0, l_self_modules_embed_tokens_parameters_weight_, l_self_modules_layers_modules_0_modules_input_layernorm_parameters_weight_, l_self_modules_layers_modules_0_modules_self_attn_modules_qkv_proj_parameters_weight_, l_positions_, l_self_modules_layers_modules_0_modules_self_attn_modules_rotary_emb_buffers_cos_sin_cache_);  l_input_ids_ = l_self_modules_embed_tokens_parameters_weight_ = l_self_modules_layers_modules_0_modules_input_layernorm_parameters_weight_ = l_self_modules_layers_modules_0_modules_self_attn_modules_qkv_proj_parameters_weight_ = None
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/compilation/cuda_piecewise_backend.py", line 116, in __call__
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     return self.compiled_graph_for_general_shape(*args)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 838, in _fn
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     return fn(*args, **kwargs)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/_functorch/aot_autograd.py", line 1201, in forward
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     return compiled_fn(full_args)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 328, in runtime_wrapper
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     all_outs = call_func_at_runtime_with_args(
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/utils.py", line 126, in call_func_at_runtime_with_args
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     out = normalize_as_list(f(args))
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]                             ^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 689, in inner_fn
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     outs = compiled_fn(args)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 495, in wrapper
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     return compiled_fn(runtime_args)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/_inductor/output_code.py", line 460, in __call__
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     return self.current_callable(inputs)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/_inductor/utils.py", line 2404, in run
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     return model(new_inputs)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/mnt/disks/mlperf-scratch/torch_compile_cache/0e78981a1e/rank_7_0/inductor_cache/5f/c5fb3aaxefqkt5ibeo5ekcydkx47zfy5l65byzr4gexshpoiclik.py", line 395, in call
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     triton_poi_fused_cat_2.run(buf5, arg5_1, arg6_1, buf6, triton_poi_fused_cat_2_xnumel, stream=stream7)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/_inductor/runtime/triton_heuristics.py", line 956, in run
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     return launcher(
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "<string>", line 5, in launcher
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/triton/backends/nvidia/driver.py", line 529, in __call__
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     self.launch(gridX, gridY, gridZ, stream, function, self.launch_cooperative_grid, global_scratch, *args)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527] RuntimeError: Triton Error [CUDA]: uncorrectable NVLink error detected during the execution
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527] Traceback (most recent call last):
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/v1/executor/multiproc_executor.py", line 522, in worker_busy_loop
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     output = func(*args, **kwargs)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]              ^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/v1/worker/gpu_worker.py", line 272, in compile_or_warm_up_model
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     hidden_states=self.model_runner._dummy_run(
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     return func(*args, **kwargs)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/v1/worker/gpu_model_runner.py", line 1847, in _dummy_run
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     outputs = model(
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]               ^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     return self._call_impl(*args, **kwargs)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     return forward_call(*args, **kwargs)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/model_executor/models/llama.py", line 581, in forward
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     model_output = self.model(input_ids, positions, intermediate_tensors,
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/compilation/decorators.py", line 246, in __call__
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     model_output = self.forward(*args, **kwargs)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/model_executor/models/llama.py", line 368, in forward
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     def forward(
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     return self._call_impl(*args, **kwargs)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     return forward_call(*args, **kwargs)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 838, in _fn
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     return fn(*args, **kwargs)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/fx/graph_module.py", line 830, in call_wrapped
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     return self._wrapped_call(self, *args, **kwargs)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/fx/graph_module.py", line 406, in __call__
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     raise e
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/fx/graph_module.py", line 393, in __call__
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     return super(self.cls, obj).__call__(*args, **kwargs)  # type: ignore[misc]
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     return self._call_impl(*args, **kwargs)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     return forward_call(*args, **kwargs)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "<eval_with_key>.162", line 490, in forward
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     submod_0 = self.submod_0(l_input_ids_, s0, l_self_modules_embed_tokens_parameters_weight_, l_self_modules_layers_modules_0_modules_input_layernorm_parameters_weight_, l_self_modules_layers_modules_0_modules_self_attn_modules_qkv_proj_parameters_weight_, l_positions_, l_self_modules_layers_modules_0_modules_self_attn_modules_rotary_emb_buffers_cos_sin_cache_);  l_input_ids_ = l_self_modules_embed_tokens_parameters_weight_ = l_self_modules_layers_modules_0_modules_input_layernorm_parameters_weight_ = l_self_modules_layers_modules_0_modules_self_attn_modules_qkv_proj_parameters_weight_ = None
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/compilation/cuda_piecewise_backend.py", line 116, in __call__
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     return self.compiled_graph_for_general_shape(*args)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 838, in _fn
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     return fn(*args, **kwargs)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/_functorch/aot_autograd.py", line 1201, in forward
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     return compiled_fn(full_args)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 328, in runtime_wrapper
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     all_outs = call_func_at_runtime_with_args(
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/utils.py", line 126, in call_func_at_runtime_with_args
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     out = normalize_as_list(f(args))
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]                             ^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 689, in inner_fn
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     outs = compiled_fn(args)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 495, in wrapper
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     return compiled_fn(runtime_args)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/_inductor/output_code.py", line 460, in __call__
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     return self.current_callable(inputs)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/_inductor/utils.py", line 2404, in run
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     return model(new_inputs)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/mnt/disks/mlperf-scratch/torch_compile_cache/0e78981a1e/rank_7_0/inductor_cache/5f/c5fb3aaxefqkt5ibeo5ekcydkx47zfy5l65byzr4gexshpoiclik.py", line 395, in call
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     triton_poi_fused_cat_2.run(buf5, arg5_1, arg6_1, buf6, triton_poi_fused_cat_2_xnumel, stream=stream7)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/torch/_inductor/runtime/triton_heuristics.py", line 956, in run
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     return launcher(
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]            ^^^^^^^^^
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "<string>", line 5, in launcher
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/triton/backends/nvidia/driver.py", line 529, in __call__
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527]     self.launch(gridX, gridY, gridZ, stream, function, self.launch_cooperative_grid, global_scratch, *args)
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527] RuntimeError: Triton Error [CUDA]: uncorrectable NVLink error detected during the execution
+[1;36m(VllmWorker rank=7 pid=376603)[0;0m ERROR 06-24 22:55:37 [multiproc_executor.py:527] 
+Failed: Cuda error /workspace/csrc/custom_all_reduce.cuh:594 'uncorrectable NVLink error detected during the execution'
+Failed: Cuda error /workspace/csrc/custom_all_reduce.cuh:594 'uncorrectable NVLink error detected during the execution'
+Failed: Cuda error /workspace/csrc/custom_all_reduce.cuh:594 'uncorrectable NVLink error detected during the execution'
+Failed: Cuda error /workspace/csrc/custom_all_reduce.cuh:594 'uncorrectable NVLink error detected during the execution'
+Failed: Cuda error /workspace/csrc/custom_all_reduce.cuh:594 'uncorrectable NVLink error detected during the execution'
+Failed: Cuda error /workspace/csrc/custom_all_reduce.cuh:594 'uncorrectable NVLink error detected during the execution'
+Failed: Cuda error /workspace/csrc/custom_all_reduce.cuh:594 'uncorrectable NVLink error detected during the execution'
+Failed: Cuda error /workspace/csrc/custom_all_reduce.cuh:594 'uncorrectable NVLink error detected during the execution'
+ERROR 06-24 22:55:37 [multiproc_executor.py:140] Worker proc VllmWorker-3 died unexpectedly, shutting down executor.
+
+--- STDERR ---
+huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+To disable this warning, you can either:
+	- Avoid using `tokenizers` before the fork if possible
+	- Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m Loading safetensors checkpoint shards:   0% Completed | 0/30 [00:00<?, ?it/s]
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m Loading safetensors checkpoint shards:   3% Completed | 1/30 [00:00<00:07,  3.87it/s]
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m Loading safetensors checkpoint shards:   7% Completed | 2/30 [00:00<00:07,  3.93it/s]
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m Loading safetensors checkpoint shards:  13% Completed | 4/30 [00:00<00:04,  5.24it/s]
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m Loading safetensors checkpoint shards:  17% Completed | 5/30 [00:01<00:05,  4.34it/s]
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m Loading safetensors checkpoint shards:  20% Completed | 6/30 [00:01<00:05,  4.04it/s]
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m Loading safetensors checkpoint shards:  23% Completed | 7/30 [00:01<00:05,  3.84it/s]
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m Loading safetensors checkpoint shards:  27% Completed | 8/30 [00:01<00:05,  3.76it/s]
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m Loading safetensors checkpoint shards:  30% Completed | 9/30 [00:02<00:05,  3.76it/s]
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m Loading safetensors checkpoint shards:  33% Completed | 10/30 [00:02<00:05,  3.75it/s]
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m Loading safetensors checkpoint shards:  37% Completed | 11/30 [00:02<00:05,  3.70it/s]
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m Loading safetensors checkpoint shards:  40% Completed | 12/30 [00:03<00:04,  3.68it/s]
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m Loading safetensors checkpoint shards:  43% Completed | 13/30 [00:03<00:04,  3.93it/s]
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m Loading safetensors checkpoint shards:  47% Completed | 14/30 [00:03<00:04,  3.93it/s]
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m Loading safetensors checkpoint shards:  50% Completed | 15/30 [00:03<00:03,  3.89it/s]
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m Loading safetensors checkpoint shards:  53% Completed | 16/30 [00:04<00:03,  3.91it/s]
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m Loading safetensors checkpoint shards:  57% Completed | 17/30 [00:04<00:03,  3.81it/s]
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m Loading safetensors checkpoint shards:  60% Completed | 18/30 [00:04<00:03,  3.97it/s]
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m Loading safetensors checkpoint shards:  63% Completed | 19/30 [00:04<00:02,  3.98it/s]
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m Loading safetensors checkpoint shards:  67% Completed | 20/30 [00:05<00:02,  4.15it/s]
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m Loading safetensors checkpoint shards:  70% Completed | 21/30 [00:05<00:02,  4.11it/s]
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m Loading safetensors checkpoint shards:  73% Completed | 22/30 [00:05<00:01,  4.10it/s]
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m Loading safetensors checkpoint shards:  77% Completed | 23/30 [00:05<00:01,  4.08it/s]
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m Loading safetensors checkpoint shards:  80% Completed | 24/30 [00:06<00:01,  4.04it/s]
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m Loading safetensors checkpoint shards:  83% Completed | 25/30 [00:06<00:01,  4.03it/s]
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m Loading safetensors checkpoint shards:  87% Completed | 26/30 [00:06<00:01,  3.99it/s]
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m Loading safetensors checkpoint shards:  90% Completed | 27/30 [00:06<00:00,  3.99it/s]
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m Loading safetensors checkpoint shards:  93% Completed | 28/30 [00:07<00:00,  3.94it/s]
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m Loading safetensors checkpoint shards:  97% Completed | 29/30 [00:07<00:00,  4.01it/s]
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m Loading safetensors checkpoint shards: 100% Completed | 30/30 [00:07<00:00,  3.99it/s]
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m Loading safetensors checkpoint shards: 100% Completed | 30/30 [00:07<00:00,  3.98it/s]
+[1;36m(VllmWorker rank=0 pid=376596)[0;0m 

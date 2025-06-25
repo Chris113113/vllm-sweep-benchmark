@@ -1,0 +1,206 @@
+[
+    {
+        "run_name": "Llama-3-3-70B_TP-1_ISL-128_OSL-1000",
+        "mode": "vllm_throughput",
+        "config": {
+            "model": "meta-llama/Llama-3.3-70B-Instruct",
+            "num-prompts": "100",
+            "gpu-memory-utilization": "0.9",
+            "ignore-eos": "--disable-tqdm",
+            "request-rate": "inf",
+            "tensor-parallel-size": "1",
+            "input-len": "128",
+            "output-len": "1000",
+            "max-model-len": "1128"
+        },
+        "results": {},
+        "client_log_file": "1_Llama-3-3-70B_TP-1_ISL-128_OSL-1000_vllm_script.log"
+    },
+    {
+        "run_name": "Llama-3-3-70B_TP-2_ISL-128_OSL-1000",
+        "mode": "vllm_throughput",
+        "config": {
+            "model": "meta-llama/Llama-3.3-70B-Instruct",
+            "num-prompts": "100",
+            "gpu-memory-utilization": "0.9",
+            "ignore-eos": "--disable-tqdm",
+            "request-rate": "inf",
+            "tensor-parallel-size": "2",
+            "input-len": "128",
+            "output-len": "1000",
+            "max-model-len": "1128"
+        },
+        "results": {},
+        "client_log_file": "2_Llama-3-3-70B_TP-2_ISL-128_OSL-1000_vllm_script.log"
+    },
+    {
+        "run_name": "Llama-3-3-70B_TP-4_ISL-128_OSL-1000",
+        "mode": "vllm_throughput",
+        "config": {
+            "model": "meta-llama/Llama-3.3-70B-Instruct",
+            "num-prompts": "100",
+            "gpu-memory-utilization": "0.9",
+            "ignore-eos": "--disable-tqdm",
+            "request-rate": "inf",
+            "tensor-parallel-size": "4",
+            "input-len": "128",
+            "output-len": "1000",
+            "max-model-len": "1128"
+        },
+        "results": {},
+        "client_log_file": "3_Llama-3-3-70B_TP-4_ISL-128_OSL-1000_vllm_script.log"
+    },
+    {
+        "run_name": "Llama-3-3-70B_TP-1_ISL-256_OSL-256",
+        "mode": "vllm_throughput",
+        "config": {
+            "model": "meta-llama/Llama-3.3-70B-Instruct",
+            "num-prompts": "100",
+            "gpu-memory-utilization": "0.9",
+            "ignore-eos": "--disable-tqdm",
+            "request-rate": "inf",
+            "tensor-parallel-size": "1",
+            "input-len": "256",
+            "output-len": "256",
+            "max-model-len": "512"
+        },
+        "results": {},
+        "client_log_file": "4_Llama-3-3-70B_TP-1_ISL-256_OSL-256_vllm_script.log"
+    },
+    {
+        "run_name": "Llama-3-3-70B_TP-2_ISL-256_OSL-256",
+        "mode": "vllm_throughput",
+        "config": {
+            "model": "meta-llama/Llama-3.3-70B-Instruct",
+            "num-prompts": "100",
+            "gpu-memory-utilization": "0.9",
+            "ignore-eos": "--disable-tqdm",
+            "request-rate": "inf",
+            "tensor-parallel-size": "2",
+            "input-len": "256",
+            "output-len": "256",
+            "max-model-len": "512"
+        },
+        "results": {},
+        "client_log_file": "5_Llama-3-3-70B_TP-2_ISL-256_OSL-256_vllm_script.log"
+    },
+    {
+        "run_name": "Llama-3-3-70B_TP-4_ISL-256_OSL-256",
+        "mode": "vllm_throughput",
+        "config": {
+            "model": "meta-llama/Llama-3.3-70B-Instruct",
+            "num-prompts": "100",
+            "gpu-memory-utilization": "0.9",
+            "ignore-eos": "--disable-tqdm",
+            "request-rate": "inf",
+            "tensor-parallel-size": "4",
+            "input-len": "256",
+            "output-len": "256",
+            "max-model-len": "512"
+        },
+        "results": {},
+        "client_log_file": "6_Llama-3-3-70B_TP-4_ISL-256_OSL-256_vllm_script.log"
+    },
+    {
+        "run_name": "Llama-3-3-70B_TP-1_ISL-1000_OSL-1000",
+        "mode": "vllm_throughput",
+        "config": {
+            "model": "meta-llama/Llama-3.3-70B-Instruct",
+            "num-prompts": "100",
+            "gpu-memory-utilization": "0.9",
+            "ignore-eos": "--disable-tqdm",
+            "request-rate": "inf",
+            "tensor-parallel-size": "1",
+            "input-len": "1000",
+            "output-len": "1000",
+            "max-model-len": "2000"
+        },
+        "results": {},
+        "client_log_file": "7_Llama-3-3-70B_TP-1_ISL-1000_OSL-1000_vllm_script.log"
+    },
+    {
+        "run_name": "Llama-3-3-70B_TP-2_ISL-1000_OSL-1000",
+        "mode": "vllm_throughput",
+        "config": {
+            "model": "meta-llama/Llama-3.3-70B-Instruct",
+            "num-prompts": "100",
+            "gpu-memory-utilization": "0.9",
+            "ignore-eos": "--disable-tqdm",
+            "request-rate": "inf",
+            "tensor-parallel-size": "2",
+            "input-len": "1000",
+            "output-len": "1000",
+            "max-model-len": "2000"
+        },
+        "results": {},
+        "client_log_file": "8_Llama-3-3-70B_TP-2_ISL-1000_OSL-1000_vllm_script.log"
+    },
+    {
+        "run_name": "Llama-3-3-70B_TP-4_ISL-1000_OSL-1000",
+        "mode": "vllm_throughput",
+        "config": {
+            "model": "meta-llama/Llama-3.3-70B-Instruct",
+            "num-prompts": "100",
+            "gpu-memory-utilization": "0.9",
+            "ignore-eos": "--disable-tqdm",
+            "request-rate": "inf",
+            "tensor-parallel-size": "4",
+            "input-len": "1000",
+            "output-len": "1000",
+            "max-model-len": "2000"
+        },
+        "results": {},
+        "client_log_file": "9_Llama-3-3-70B_TP-4_ISL-1000_OSL-1000_vllm_script.log"
+    },
+    {
+        "run_name": "Llama-3-3-70B_TP-1_ISL-5000_OSL-5000",
+        "mode": "vllm_throughput",
+        "config": {
+            "model": "meta-llama/Llama-3.3-70B-Instruct",
+            "num-prompts": "100",
+            "gpu-memory-utilization": "0.9",
+            "ignore-eos": "--disable-tqdm",
+            "request-rate": "inf",
+            "tensor-parallel-size": "1",
+            "input-len": "5000",
+            "output-len": "5000",
+            "max-model-len": "10000"
+        },
+        "results": {},
+        "client_log_file": "10_Llama-3-3-70B_TP-1_ISL-5000_OSL-5000_vllm_script.log"
+    },
+    {
+        "run_name": "Llama-3-3-70B_TP-2_ISL-5000_OSL-5000",
+        "mode": "vllm_throughput",
+        "config": {
+            "model": "meta-llama/Llama-3.3-70B-Instruct",
+            "num-prompts": "100",
+            "gpu-memory-utilization": "0.9",
+            "ignore-eos": "--disable-tqdm",
+            "request-rate": "inf",
+            "tensor-parallel-size": "2",
+            "input-len": "5000",
+            "output-len": "5000",
+            "max-model-len": "10000"
+        },
+        "results": {},
+        "client_log_file": "11_Llama-3-3-70B_TP-2_ISL-5000_OSL-5000_vllm_script.log"
+    },
+    {
+        "run_name": "Llama-3-3-70B_TP-4_ISL-5000_OSL-5000",
+        "mode": "vllm_throughput",
+        "config": {
+            "model": "meta-llama/Llama-3.3-70B-Instruct",
+            "num-prompts": "100",
+            "gpu-memory-utilization": "0.9",
+            "ignore-eos": "--disable-tqdm",
+            "request-rate": "inf",
+            "tensor-parallel-size": "4",
+            "input-len": "5000",
+            "output-len": "5000",
+            "max-model-len": "10000"
+        },
+        "results": {},
+        "client_log_file": "12_Llama-3-3-70B_TP-4_ISL-5000_OSL-5000_vllm_script.log"
+    }
+]

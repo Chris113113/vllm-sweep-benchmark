@@ -1,0 +1,68 @@
+--- Client Run: Llama-3-3-8b - 1000 / 1000 ---
+
+--- Client STDOUT ---
+{
+  "config": {
+    "model": "meta-llama/Llama-3.3-70B-Instruct",
+    "latency_test_prompts": 10,
+    "throughput_test_prompts": 1000,
+    "concurrency": 100,
+    "max_input_length": 1000,
+    "max_output_length": 1000,
+    "request_timeout": 180
+  },
+  "results": {
+    "p1_ttft_ms": 27.44,
+    "p50_ttft_ms": 27.81,
+    "p95_ttft_ms": 29.86,
+    "p99_ttft_ms": 31.12,
+    "p1_tbst_ms": 17.19,
+    "p50_tbst_ms": 17.31,
+    "p95_tbst_ms": 17.74,
+    "p99_tbst_ms": 17.85,
+    "p1_mean_itl_ms": 17.33,
+    "p50_mean_itl_ms": 17.34,
+    "p95_mean_itl_ms": 17.34,
+    "p99_mean_itl_ms": 17.34,
+    "total_duration_sec": 292.52,
+    "successful_requests": 1000,
+    "failed_requests": 0,
+    "total_tokens_generated": 1000000,
+    "throughput_req_per_sec": 3.42,
+    "throughput_tokens_per_sec": 3418.59,
+    "errors": []
+  }
+}
+
+--- Client STDERR ---
+
+================================================================================
+PHASE 1: Running Latency Probe (10 serial requests)...
+================================================================================
+  Latency probe 1/10 complete.  Latency probe 2/10 complete.  Latency probe 3/10 complete.  Latency probe 4/10 complete.  Latency probe 5/10 complete.  Latency probe 6/10 complete.  Latency probe 7/10 complete.  Latency probe 8/10 complete.  Latency probe 9/10 complete.  Latency probe 10/10 complete.
+================================================================================
+PHASE 2: Running Throughput Test (1000 requests at concurrency 100)...
+================================================================================
+Client (Throughput): Completed 100/1000 requests...
+Client (Throughput): Completed 200/1000 requests...
+Client (Throughput): Completed 300/1000 requests...
+Client (Throughput): Completed 400/1000 requests...
+Client (Throughput): Completed 500/1000 requests...
+Client (Throughput): Completed 600/1000 requests...
+Client (Throughput): Completed 700/1000 requests...
+Client (Throughput): Completed 800/1000 requests...
+Client (Throughput): Completed 900/1000 requests...
+Client (Throughput): Completed 1000/1000 requests...
+
+
+================================================================================
+Benchmark Complete: Final Summary
+================================================================================
+--- Latency (ms) ---
+  Time to First Token (TTFT): p50: 27.81, p95: 29.86, p99: 31.12
+  Inter-Token Latency (ITL):  p50: 17.34, p95: 17.34, p99: 17.34
+
+--- Throughput ---
+  Requests per second: 3.42
+  Tokens per second:   3418.59
+================================================================================

@@ -1,0 +1,16 @@
+--extra-index-url https://download.pytorch.org/whl/cu128
+
+# For vLLM Server & Benchmarking
+aiohttp
+datasets
+requests
+numpy
+nvidia-ml-py
+pyyaml
+
+# For Visualization
+pandas
+matplotlib
+seaborn
+
+vllm==0.9.1

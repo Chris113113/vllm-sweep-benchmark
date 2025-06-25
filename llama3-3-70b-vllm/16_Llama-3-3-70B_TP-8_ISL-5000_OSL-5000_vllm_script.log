@@ -1,0 +1,125 @@
+--- STDOUT ---
+INFO 06-25 00:00:04 [__init__.py:244] Automatically detected platform cuda.
+When dataset path is not set, it will default to random dataset
+Namespace(backend='vllm', dataset_name='random', dataset=None, dataset_path=None, input_len=5000, output_len=5000, n=1, num_prompts=100, hf_max_batch_size=None, output_json=None, async_engine=False, disable_frontend_multiprocessing=False, disable_detokenize=False, lora_path=None, prefix_len=None, random_range_ratio=None, hf_subset=None, hf_split=None, model='meta-llama/Llama-3.3-70B-Instruct', task='auto', tokenizer='meta-llama/Llama-3.3-70B-Instruct', tokenizer_mode='auto', trust_remote_code=False, dtype='auto', seed=0, hf_config_path=None, allowed_local_media_path='', revision=None, code_revision=None, rope_scaling={}, rope_theta=None, tokenizer_revision=None, max_model_len=10000, quantization=None, enforce_eager=False, max_seq_len_to_capture=8192, max_logprobs=20, disable_sliding_window=False, disable_cascade_attn=False, skip_tokenizer_init=False, enable_prompt_embeds=False, served_model_name=None, disable_async_output_proc=False, config_format='auto', hf_token=None, hf_overrides={}, override_neuron_config={}, override_pooler_config=None, logits_processor_pattern=None, generation_config='auto', override_generation_config={}, enable_sleep_mode=False, model_impl='auto', load_format='auto', download_dir=None, model_loader_extra_config={}, ignore_patterns=None, use_tqdm_on_load=True, qlora_adapter_name_or_path=None, pt_load_map_location='cpu', guided_decoding_backend='auto', guided_decoding_disable_fallback=False, guided_decoding_disable_any_whitespace=False, guided_decoding_disable_additional_properties=False, enable_reasoning=None, reasoning_parser='', distributed_executor_backend=None, pipeline_parallel_size=1, tensor_parallel_size=8, data_parallel_size=1, data_parallel_size_local=None, data_parallel_address=None, data_parallel_rpc_port=None, data_parallel_backend='mp', enable_expert_parallel=False, max_parallel_loading_workers=None, ray_workers_use_nsight=False, disable_custom_all_reduce=False, worker_cls='auto', worker_extension_cls='', enable_multimodal_encoder_data_parallel=False, block_size=None, gpu_memory_utilization=0.9, swap_space=4, kv_cache_dtype='auto', num_gpu_blocks_override=None, enable_prefix_caching=None, prefix_caching_hash_algo='builtin', cpu_offload_gb=0, calculate_kv_scales=False, tokenizer_pool_size=0, tokenizer_pool_type='ray', tokenizer_pool_extra_config={}, limit_mm_per_prompt={}, mm_processor_kwargs=None, disable_mm_preprocessor_cache=False, enable_lora=None, enable_lora_bias=False, max_loras=1, max_lora_rank=16, lora_extra_vocab_size=256, lora_dtype='auto', long_lora_scaling_factors=None, max_cpu_loras=None, fully_sharded_loras=False, enable_prompt_adapter=None, max_prompt_adapters=1, max_prompt_adapter_token=0, device='auto', speculative_config=None, show_hidden_metrics_for_version=None, otlp_traces_endpoint=None, collect_detailed_traces=None, max_num_batched_tokens=None, max_num_seqs=None, max_num_partial_prefills=1, max_long_partial_prefills=1, cuda_graph_sizes=[512], long_prefill_token_threshold=0, num_lookahead_slots=0, scheduler_delay_factor=0.0, preemption_mode=None, num_scheduler_steps=1, multi_step_stream_outputs=True, scheduling_policy='fcfs', enable_chunked_prefill=None, disable_chunked_mm_input=False, scheduler_cls='vllm.core.scheduler.Scheduler', disable_hybrid_kv_cache_manager=False, kv_transfer_config=None, kv_events_config=None, compilation_config={"level":0,"debug_dump_path":"","cache_dir":"","backend":"","custom_ops":[],"splitting_ops":[],"use_inductor":true,"compile_sizes":null,"inductor_compile_config":{"enable_auto_functionalized_v2":false},"inductor_passes":{},"use_cudagraph":true,"cudagraph_num_of_warmups":0,"cudagraph_capture_sizes":null,"cudagraph_copy_inputs":false,"full_cuda_graph":false,"max_capture_size":null,"local_cache_dir":null}, additional_config={}, use_v2_block_manager=True, disable_log_stats=False, disable_log_requests=False)
+INFO 06-25 00:00:14 [config.py:823] This model supports multiple tasks: {'classify', 'score', 'generate', 'reward', 'embed'}. Defaulting to 'generate'.
+INFO 06-25 00:00:14 [config.py:1946] Defaulting to use mp for distributed inference
+INFO 06-25 00:00:14 [config.py:2195] Chunked prefill is enabled with max_num_batched_tokens=16384.
+INFO 06-25 00:00:15 [core.py:455] Waiting for init message from front-end.
+INFO 06-25 00:00:15 [core.py:70] Initializing a V1 LLM engine (v0.9.1) with config: model='meta-llama/Llama-3.3-70B-Instruct', speculative_config=None, tokenizer='meta-llama/Llama-3.3-70B-Instruct', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, override_neuron_config={}, tokenizer_revision=None, trust_remote_code=False, dtype=torch.bfloat16, max_seq_len=10000, download_dir=None, load_format=LoadFormat.AUTO, tensor_parallel_size=8, pipeline_parallel_size=1, disable_custom_all_reduce=False, quantization=None, enforce_eager=False, kv_cache_dtype=auto,  device_config=cuda, decoding_config=DecodingConfig(backend='auto', disable_fallback=False, disable_any_whitespace=False, disable_additional_properties=False, reasoning_backend=''), observability_config=ObservabilityConfig(show_hidden_metrics_for_version=None, otlp_traces_endpoint=None, collect_detailed_traces=None), seed=0, served_model_name=meta-llama/Llama-3.3-70B-Instruct, num_scheduler_steps=1, multi_step_stream_outputs=True, enable_prefix_caching=True, chunked_prefill_enabled=True, use_async_output_proc=True, pooler_config=None, compilation_config={"level":3,"debug_dump_path":"","cache_dir":"","backend":"","custom_ops":["none"],"splitting_ops":["vllm.unified_attention","vllm.unified_attention_with_output"],"use_inductor":true,"compile_sizes":[],"inductor_compile_config":{"enable_auto_functionalized_v2":false},"inductor_passes":{},"use_cudagraph":true,"cudagraph_num_of_warmups":1,"cudagraph_capture_sizes":[512,504,496,488,480,472,464,456,448,440,432,424,416,408,400,392,384,376,368,360,352,344,336,328,320,312,304,296,288,280,272,264,256,248,240,232,224,216,208,200,192,184,176,168,160,152,144,136,128,120,112,104,96,88,80,72,64,56,48,40,32,24,16,8,4,2,1],"cudagraph_copy_inputs":false,"full_cuda_graph":false,"max_capture_size":512,"local_cache_dir":null}
+WARNING 06-25 00:00:15 [multiproc_worker_utils.py:307] Reducing Torch parallelism from 112 threads to 1 to avoid unnecessary CPU contention. Set OMP_NUM_THREADS in the external environment to tune this value as needed.
+INFO 06-25 00:00:15 [shm_broadcast.py:289] vLLM message queue communication handle: Handle(local_reader_ranks=[0, 1, 2, 3, 4, 5, 6, 7], buffer_handle=(8, 16777216, 10, 'psm_f8af2ade'), local_subscribe_addr='ipc:///tmp/3dd398ff-3f7b-4cc6-ad8f-23966630e56a', remote_subscribe_addr=None, remote_addr_ipv6=False)
+WARNING 06-25 00:00:15 [utils.py:2737] Methods determine_num_available_blocks,device_config,get_cache_block_size_bytes,initialize_cache not implemented in <vllm.v1.worker.gpu_worker.Worker object at 0x7c12b92f72f0>
+[1;36m(VllmWorker rank=0 pid=26218)[0;0m INFO 06-25 00:00:15 [shm_broadcast.py:289] vLLM message queue communication handle: Handle(local_reader_ranks=[0], buffer_handle=(1, 10485760, 10, 'psm_6ef1df40'), local_subscribe_addr='ipc:///tmp/6c4fc3df-9ccf-40b5-a788-d3996ab8a115', remote_subscribe_addr=None, remote_addr_ipv6=False)
+WARNING 06-25 00:00:15 [utils.py:2737] Methods determine_num_available_blocks,device_config,get_cache_block_size_bytes,initialize_cache not implemented in <vllm.v1.worker.gpu_worker.Worker object at 0x7c12b92f70b0>
+[1;36m(VllmWorker rank=1 pid=26219)[0;0m INFO 06-25 00:00:15 [shm_broadcast.py:289] vLLM message queue communication handle: Handle(local_reader_ranks=[0], buffer_handle=(1, 10485760, 10, 'psm_821f6dfa'), local_subscribe_addr='ipc:///tmp/c089ede6-2f6c-44b4-a435-102ab1cc0e42', remote_subscribe_addr=None, remote_addr_ipv6=False)
+WARNING 06-25 00:00:15 [utils.py:2737] Methods determine_num_available_blocks,device_config,get_cache_block_size_bytes,initialize_cache not implemented in <vllm.v1.worker.gpu_worker.Worker object at 0x7c12b92f6f60>
+[1;36m(VllmWorker rank=2 pid=26220)[0;0m INFO 06-25 00:00:15 [shm_broadcast.py:289] vLLM message queue communication handle: Handle(local_reader_ranks=[0], buffer_handle=(1, 10485760, 10, 'psm_89c37149'), local_subscribe_addr='ipc:///tmp/eff69af1-7b39-46bf-b812-cdf3edb9bd60', remote_subscribe_addr=None, remote_addr_ipv6=False)
+WARNING 06-25 00:00:15 [utils.py:2737] Methods determine_num_available_blocks,device_config,get_cache_block_size_bytes,initialize_cache not implemented in <vllm.v1.worker.gpu_worker.Worker object at 0x7c14176396d0>
+[1;36m(VllmWorker rank=3 pid=26221)[0;0m INFO 06-25 00:00:15 [shm_broadcast.py:289] vLLM message queue communication handle: Handle(local_reader_ranks=[0], buffer_handle=(1, 10485760, 10, 'psm_b081a055'), local_subscribe_addr='ipc:///tmp/31e37efd-0c90-4112-8702-4338daaf39c7', remote_subscribe_addr=None, remote_addr_ipv6=False)
+WARNING 06-25 00:00:15 [utils.py:2737] Methods determine_num_available_blocks,device_config,get_cache_block_size_bytes,initialize_cache not implemented in <vllm.v1.worker.gpu_worker.Worker object at 0x7c1410bf1310>
+[1;36m(VllmWorker rank=5 pid=26223)[0;0m INFO 06-25 00:00:15 [shm_broadcast.py:289] vLLM message queue communication handle: Handle(local_reader_ranks=[0], buffer_handle=(1, 10485760, 10, 'psm_a220e600'), local_subscribe_addr='ipc:///tmp/dbcada37-694a-4526-9176-a7fde88bb268', remote_subscribe_addr=None, remote_addr_ipv6=False)
+WARNING 06-25 00:00:15 [utils.py:2737] Methods determine_num_available_blocks,device_config,get_cache_block_size_bytes,initialize_cache not implemented in <vllm.v1.worker.gpu_worker.Worker object at 0x7c12b92f69c0>
+[1;36m(VllmWorker rank=7 pid=26225)[0;0m INFO 06-25 00:00:15 [shm_broadcast.py:289] vLLM message queue communication handle: Handle(local_reader_ranks=[0], buffer_handle=(1, 10485760, 10, 'psm_efb76046'), local_subscribe_addr='ipc:///tmp/136a6b34-ae7b-4c33-9f93-0455e108b5fc', remote_subscribe_addr=None, remote_addr_ipv6=False)
+WARNING 06-25 00:00:15 [utils.py:2737] Methods determine_num_available_blocks,device_config,get_cache_block_size_bytes,initialize_cache not implemented in <vllm.v1.worker.gpu_worker.Worker object at 0x7c12b92f68d0>
+WARNING 06-25 00:00:15 [utils.py:2737] Methods determine_num_available_blocks,device_config,get_cache_block_size_bytes,initialize_cache not implemented in <vllm.v1.worker.gpu_worker.Worker object at 0x7c12b92f6630>
+[1;36m(VllmWorker rank=4 pid=26222)[0;0m INFO 06-25 00:00:15 [shm_broadcast.py:289] vLLM message queue communication handle: Handle(local_reader_ranks=[0], buffer_handle=(1, 10485760, 10, 'psm_0c5b60f5'), local_subscribe_addr='ipc:///tmp/d7a1cc66-b3e1-4e25-985f-0decd8e87f5e', remote_subscribe_addr=None, remote_addr_ipv6=False)
+[1;36m(VllmWorker rank=6 pid=26224)[0;0m INFO 06-25 00:00:15 [shm_broadcast.py:289] vLLM message queue communication handle: Handle(local_reader_ranks=[0], buffer_handle=(1, 10485760, 10, 'psm_c2262fb8'), local_subscribe_addr='ipc:///tmp/e27d3b70-cfc1-43ee-a92b-5bd138d43387', remote_subscribe_addr=None, remote_addr_ipv6=False)
+[1;36m(VllmWorker rank=0 pid=26218)[0;0m ERROR 06-25 00:00:19 [multiproc_executor.py:492] WorkerProc failed to start.
+[1;36m(VllmWorker rank=0 pid=26218)[0;0m ERROR 06-25 00:00:19 [multiproc_executor.py:492] Traceback (most recent call last):
+[1;36m(VllmWorker rank=0 pid=26218)[0;0m ERROR 06-25 00:00:19 [multiproc_executor.py:492]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/v1/executor/multiproc_executor.py", line 466, in worker_main
+[1;36m(VllmWorker rank=0 pid=26218)[0;0m ERROR 06-25 00:00:19 [multiproc_executor.py:492]     worker = WorkerProc(*args, **kwargs)
+[1;36m(VllmWorker rank=0 pid=26218)[0;0m ERROR 06-25 00:00:19 [multiproc_executor.py:492]              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=0 pid=26218)[0;0m ERROR 06-25 00:00:19 [multiproc_executor.py:492]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/v1/executor/multiproc_executor.py", line 362, in __init__
+[1;36m(VllmWorker rank=0 pid=26218)[0;0m ERROR 06-25 00:00:19 [multiproc_executor.py:492]     self.worker.init_device()
+[1;36m(VllmWorker rank=0 pid=26218)[0;0m ERROR 06-25 00:00:19 [multiproc_executor.py:492]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/worker/worker_base.py", line 606, in init_device
+[1;36m(VllmWorker rank=0 pid=26218)[0;0m ERROR 06-25 00:00:19 [multiproc_executor.py:492]     self.worker.init_device()  # type: ignore
+[1;36m(VllmWorker rank=0 pid=26218)[0;0m ERROR 06-25 00:00:19 [multiproc_executor.py:492]     ^^^^^^^^^^^^^^^^^^^^^^^^^
+[1;36m(VllmWorker rank=0 pid=26218)[0;0m ERROR 06-25 00:00:19 [multiproc_executor.py:492]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/v1/worker/gpu_worker.py", line 140, in init_device
+[1;36m(VllmWorker rank=0 pid=26218)[0;0m ERROR 06-25 00:00:19 [multiproc_executor.py:492]     raise ValueError(
+[1;36m(VllmWorker rank=0 pid=26218)[0;0m ERROR 06-25 00:00:19 [multiproc_executor.py:492] ValueError: Free memory on device (14.58/178.36 GiB) on startup is less than desired GPU memory utilization (0.9, 160.53 GiB). Decrease GPU memory utilization or reduce GPU memory used by other processes.
+ERROR 06-25 00:00:23 [core.py:515] EngineCore failed to start.
+ERROR 06-25 00:00:23 [core.py:515] Traceback (most recent call last):
+ERROR 06-25 00:00:23 [core.py:515]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/v1/engine/core.py", line 506, in run_engine_core
+ERROR 06-25 00:00:23 [core.py:515]     engine_core = EngineCoreProc(*args, **kwargs)
+ERROR 06-25 00:00:23 [core.py:515]                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ERROR 06-25 00:00:23 [core.py:515]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/v1/engine/core.py", line 390, in __init__
+ERROR 06-25 00:00:23 [core.py:515]     super().__init__(vllm_config, executor_class, log_stats,
+ERROR 06-25 00:00:23 [core.py:515]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/v1/engine/core.py", line 76, in __init__
+ERROR 06-25 00:00:23 [core.py:515]     self.model_executor = executor_class(vllm_config)
+ERROR 06-25 00:00:23 [core.py:515]                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ERROR 06-25 00:00:23 [core.py:515]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/executor/executor_base.py", line 53, in __init__
+ERROR 06-25 00:00:23 [core.py:515]     self._init_executor()
+ERROR 06-25 00:00:23 [core.py:515]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/v1/executor/multiproc_executor.py", line 98, in _init_executor
+ERROR 06-25 00:00:23 [core.py:515]     self.workers = WorkerProc.wait_for_ready(unready_workers)
+ERROR 06-25 00:00:23 [core.py:515]                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ERROR 06-25 00:00:23 [core.py:515]   File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/v1/executor/multiproc_executor.py", line 427, in wait_for_ready
+ERROR 06-25 00:00:23 [core.py:515]     raise e from None
+ERROR 06-25 00:00:23 [core.py:515] Exception: WorkerProc initialization failed due to an exception in a background process. See stack trace for root cause.
+
+--- STDERR ---
+huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+To disable this warning, you can either:
+	- Avoid using `tokenizers` before the fork if possible
+	- Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+Process EngineCore_0:
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/usr/lib/python3.12/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/v1/engine/core.py", line 519, in run_engine_core
+    raise e
+  File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/v1/engine/core.py", line 506, in run_engine_core
+    engine_core = EngineCoreProc(*args, **kwargs)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/v1/engine/core.py", line 390, in __init__
+    super().__init__(vllm_config, executor_class, log_stats,
+  File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/v1/engine/core.py", line 76, in __init__
+    self.model_executor = executor_class(vllm_config)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/executor/executor_base.py", line 53, in __init__
+    self._init_executor()
+  File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/v1/executor/multiproc_executor.py", line 98, in _init_executor
+    self.workers = WorkerProc.wait_for_ready(unready_workers)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/v1/executor/multiproc_executor.py", line 427, in wait_for_ready
+    raise e from None
+Exception: WorkerProc initialization failed due to an exception in a background process. See stack trace for root cause.
+Traceback (most recent call last):
+  File "/home/pirillo_google_com/vllm_benchmark/vllm-repo-benchmark/benchmarks/benchmark_throughput.py", line 724, in <module>
+    main(args)
+  File "/home/pirillo_google_com/vllm_benchmark/vllm-repo-benchmark/benchmarks/benchmark_throughput.py", line 407, in main
+    elapsed_time, request_outputs = run_vllm(
+                                    ^^^^^^^^^
+  File "/home/pirillo_google_com/vllm_benchmark/vllm-repo-benchmark/benchmarks/benchmark_throughput.py", line 50, in run_vllm
+    llm = LLM(**dataclasses.asdict(engine_args))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/entrypoints/llm.py", line 243, in __init__
+/usr/lib/python3.12/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 1 leaked shared_memory objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+    self.llm_engine = LLMEngine.from_engine_args(
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/engine/llm_engine.py", line 501, in from_engine_args
+    return engine_cls.from_vllm_config(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/v1/engine/llm_engine.py", line 124, in from_vllm_config
+    return cls(vllm_config=vllm_config,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/v1/engine/llm_engine.py", line 101, in __init__
+    self.engine_core = EngineCoreClient.make_client(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/v1/engine/core_client.py", line 75, in make_client
+    return SyncMPClient(vllm_config, executor_class, log_stats)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/v1/engine/core_client.py", line 558, in __init__
+    super().__init__(
+  File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/v1/engine/core_client.py", line 422, in __init__
+    self._init_engines_direct(vllm_config, local_only,
+  File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/v1/engine/core_client.py", line 491, in _init_engines_direct
+    self._wait_for_engine_startup(handshake_socket, input_address,
+  File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/v1/engine/core_client.py", line 511, in _wait_for_engine_startup
+    wait_for_engine_startup(
+  File "/home/pirillo_google_com/.vllm/lib/python3.12/site-packages/vllm/v1/utils.py", line 494, in wait_for_engine_startup
+    raise RuntimeError("Engine core initialization failed. "
+RuntimeError: Engine core initialization failed. See root cause above. Failed core proc(s): {'EngineCore_0': 1}

@@ -1,0 +1,105 @@
+--- STDOUT ---
+INFO 06-25 03:39:19 [__init__.py:244] Automatically detected platform cuda.
+When dataset path is not set, it will default to random dataset
+Namespace(backend='vllm', dataset_name='random', dataset=None, dataset_path=None, input_len=1024, output_len=1024, n=1, num_prompts=200, hf_max_batch_size=None, output_json=None, async_engine=False, disable_frontend_multiprocessing=False, disable_detokenize=False, lora_path=None, prefix_len=None, random_range_ratio=None, hf_subset=None, hf_split=None, model='meta-llama/Llama-3.3-70B-Instruct', task='auto', tokenizer='meta-llama/Llama-3.3-70B-Instruct', tokenizer_mode='auto', trust_remote_code=False, dtype='auto', seed=0, hf_config_path=None, allowed_local_media_path='', revision=None, code_revision=None, rope_scaling={}, rope_theta=None, tokenizer_revision=None, max_model_len=2048, quantization='fp8', enforce_eager=False, max_seq_len_to_capture=8192, max_logprobs=20, disable_sliding_window=False, disable_cascade_attn=False, skip_tokenizer_init=False, enable_prompt_embeds=False, served_model_name=None, disable_async_output_proc=False, config_format='auto', hf_token=None, hf_overrides={}, override_neuron_config={}, override_pooler_config=None, logits_processor_pattern=None, generation_config='auto', override_generation_config={}, enable_sleep_mode=False, model_impl='auto', load_format='auto', download_dir=None, model_loader_extra_config={}, ignore_patterns=None, use_tqdm_on_load=True, qlora_adapter_name_or_path=None, pt_load_map_location='cpu', guided_decoding_backend='auto', guided_decoding_disable_fallback=False, guided_decoding_disable_any_whitespace=False, guided_decoding_disable_additional_properties=False, enable_reasoning=None, reasoning_parser='', distributed_executor_backend=None, pipeline_parallel_size=1, tensor_parallel_size=2, data_parallel_size=1, data_parallel_size_local=None, data_parallel_address=None, data_parallel_rpc_port=None, data_parallel_backend='mp', enable_expert_parallel=False, max_parallel_loading_workers=None, ray_workers_use_nsight=False, disable_custom_all_reduce=False, worker_cls='auto', worker_extension_cls='', enable_multimodal_encoder_data_parallel=False, block_size=None, gpu_memory_utilization=0.9, swap_space=4, kv_cache_dtype='auto', num_gpu_blocks_override=None, enable_prefix_caching=None, prefix_caching_hash_algo='builtin', cpu_offload_gb=0, calculate_kv_scales=False, tokenizer_pool_size=0, tokenizer_pool_type='ray', tokenizer_pool_extra_config={}, limit_mm_per_prompt={}, mm_processor_kwargs=None, disable_mm_preprocessor_cache=False, enable_lora=None, enable_lora_bias=False, max_loras=1, max_lora_rank=16, lora_extra_vocab_size=256, lora_dtype='auto', long_lora_scaling_factors=None, max_cpu_loras=None, fully_sharded_loras=False, enable_prompt_adapter=None, max_prompt_adapters=1, max_prompt_adapter_token=0, device='auto', speculative_config=None, show_hidden_metrics_for_version=None, otlp_traces_endpoint=None, collect_detailed_traces=None, max_num_batched_tokens=None, max_num_seqs=None, max_num_partial_prefills=1, max_long_partial_prefills=1, cuda_graph_sizes=[512], long_prefill_token_threshold=0, num_lookahead_slots=0, scheduler_delay_factor=0.0, preemption_mode=None, num_scheduler_steps=1, multi_step_stream_outputs=True, scheduling_policy='fcfs', enable_chunked_prefill=None, disable_chunked_mm_input=False, scheduler_cls='vllm.core.scheduler.Scheduler', disable_hybrid_kv_cache_manager=False, kv_transfer_config=None, kv_events_config=None, compilation_config={"level":0,"debug_dump_path":"","cache_dir":"","backend":"","custom_ops":[],"splitting_ops":[],"use_inductor":true,"compile_sizes":null,"inductor_compile_config":{"enable_auto_functionalized_v2":false},"inductor_passes":{},"use_cudagraph":true,"cudagraph_num_of_warmups":0,"cudagraph_capture_sizes":null,"cudagraph_copy_inputs":false,"full_cuda_graph":false,"max_capture_size":null,"local_cache_dir":null}, additional_config={}, use_v2_block_manager=True, disable_log_stats=False, disable_log_requests=False)
+INFO 06-25 03:39:28 [config.py:823] This model supports multiple tasks: {'classify', 'reward', 'score', 'embed', 'generate'}. Defaulting to 'generate'.
+INFO 06-25 03:39:28 [config.py:1946] Defaulting to use mp for distributed inference
+INFO 06-25 03:39:28 [config.py:2195] Chunked prefill is enabled with max_num_batched_tokens=16384.
+INFO 06-25 03:39:29 [core.py:455] Waiting for init message from front-end.
+INFO 06-25 03:39:29 [core.py:70] Initializing a V1 LLM engine (v0.9.1) with config: model='meta-llama/Llama-3.3-70B-Instruct', speculative_config=None, tokenizer='meta-llama/Llama-3.3-70B-Instruct', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, override_neuron_config={}, tokenizer_revision=None, trust_remote_code=False, dtype=torch.bfloat16, max_seq_len=2048, download_dir=None, load_format=LoadFormat.AUTO, tensor_parallel_size=2, pipeline_parallel_size=1, disable_custom_all_reduce=False, quantization=fp8, enforce_eager=False, kv_cache_dtype=auto,  device_config=cuda, decoding_config=DecodingConfig(backend='auto', disable_fallback=False, disable_any_whitespace=False, disable_additional_properties=False, reasoning_backend=''), observability_config=ObservabilityConfig(show_hidden_metrics_for_version=None, otlp_traces_endpoint=None, collect_detailed_traces=None), seed=0, served_model_name=meta-llama/Llama-3.3-70B-Instruct, num_scheduler_steps=1, multi_step_stream_outputs=True, enable_prefix_caching=True, chunked_prefill_enabled=True, use_async_output_proc=True, pooler_config=None, compilation_config={"level":3,"debug_dump_path":"","cache_dir":"","backend":"","custom_ops":["none"],"splitting_ops":["vllm.unified_attention","vllm.unified_attention_with_output"],"use_inductor":true,"compile_sizes":[],"inductor_compile_config":{"enable_auto_functionalized_v2":false},"inductor_passes":{},"use_cudagraph":true,"cudagraph_num_of_warmups":1,"cudagraph_capture_sizes":[512,504,496,488,480,472,464,456,448,440,432,424,416,408,400,392,384,376,368,360,352,344,336,328,320,312,304,296,288,280,272,264,256,248,240,232,224,216,208,200,192,184,176,168,160,152,144,136,128,120,112,104,96,88,80,72,64,56,48,40,32,24,16,8,4,2,1],"cudagraph_copy_inputs":false,"full_cuda_graph":false,"max_capture_size":512,"local_cache_dir":null}
+WARNING 06-25 03:39:29 [multiproc_worker_utils.py:307] Reducing Torch parallelism from 112 threads to 1 to avoid unnecessary CPU contention. Set OMP_NUM_THREADS in the external environment to tune this value as needed.
+INFO 06-25 03:39:29 [shm_broadcast.py:289] vLLM message queue communication handle: Handle(local_reader_ranks=[0, 1], buffer_handle=(2, 16777216, 10, 'psm_f3403fa6'), local_subscribe_addr='ipc:///tmp/1cf91f24-f13f-478a-84da-70e965cd0806', remote_subscribe_addr=None, remote_addr_ipv6=False)
+WARNING 06-25 03:39:29 [utils.py:2737] Methods determine_num_available_blocks,device_config,get_cache_block_size_bytes,initialize_cache not implemented in <vllm.v1.worker.gpu_worker.Worker object at 0x7e20386996d0>
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m INFO 06-25 03:39:29 [shm_broadcast.py:289] vLLM message queue communication handle: Handle(local_reader_ranks=[0], buffer_handle=(1, 10485760, 10, 'psm_30107988'), local_subscribe_addr='ipc:///tmp/656a2378-5f9c-4418-a650-22bd48459a1a', remote_subscribe_addr=None, remote_addr_ipv6=False)
+WARNING 06-25 03:39:29 [utils.py:2737] Methods determine_num_available_blocks,device_config,get_cache_block_size_bytes,initialize_cache not implemented in <vllm.v1.worker.gpu_worker.Worker object at 0x7e1c40257b30>
+[1;36m(VllmWorker rank=1 pid=51674)[0;0m INFO 06-25 03:39:29 [shm_broadcast.py:289] vLLM message queue communication handle: Handle(local_reader_ranks=[0], buffer_handle=(1, 10485760, 10, 'psm_e891167d'), local_subscribe_addr='ipc:///tmp/c65d8ac0-7b84-4393-950b-c94357160827', remote_subscribe_addr=None, remote_addr_ipv6=False)
+[1;36m(VllmWorker rank=1 pid=51674)[0;0m INFO 06-25 03:39:35 [utils.py:1126] Found nccl from library libnccl.so.2
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m INFO 06-25 03:39:35 [utils.py:1126] Found nccl from library libnccl.so.2
+[1;36m(VllmWorker rank=1 pid=51674)[0;0m INFO 06-25 03:39:35 [pynccl.py:70] vLLM is using nccl==2.26.2
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m INFO 06-25 03:39:35 [pynccl.py:70] vLLM is using nccl==2.26.2
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m INFO 06-25 03:40:06 [custom_all_reduce_utils.py:246] reading GPU P2P access cache from /home/pirillo_google_com/.cache/vllm/gpu_p2p_access_cache_for_0,1,2,3,4,5,6,7.json
+[1;36m(VllmWorker rank=1 pid=51674)[0;0m INFO 06-25 03:40:06 [custom_all_reduce_utils.py:246] reading GPU P2P access cache from /home/pirillo_google_com/.cache/vllm/gpu_p2p_access_cache_for_0,1,2,3,4,5,6,7.json
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m INFO 06-25 03:40:06 [shm_broadcast.py:289] vLLM message queue communication handle: Handle(local_reader_ranks=[1], buffer_handle=(1, 4194304, 6, 'psm_12906f26'), local_subscribe_addr='ipc:///tmp/5cf57010-7b7d-44d9-abd5-f8731eecce62', remote_subscribe_addr=None, remote_addr_ipv6=False)
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m INFO 06-25 03:40:06 [parallel_state.py:1065] rank 0 in world size 2 is assigned as DP rank 0, PP rank 0, TP rank 0, EP rank 0
+[1;36m(VllmWorker rank=1 pid=51674)[0;0m INFO 06-25 03:40:06 [parallel_state.py:1065] rank 1 in world size 2 is assigned as DP rank 0, PP rank 0, TP rank 1, EP rank 1
+[1;36m(VllmWorker rank=1 pid=51674)[0;0m WARNING 06-25 03:40:06 [topk_topp_sampler.py:59] FlashInfer is not available. Falling back to the PyTorch-native implementation of top-p & top-k sampling. For the best performance, please install FlashInfer.
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m WARNING 06-25 03:40:06 [topk_topp_sampler.py:59] FlashInfer is not available. Falling back to the PyTorch-native implementation of top-p & top-k sampling. For the best performance, please install FlashInfer.
+[1;36m(VllmWorker rank=1 pid=51674)[0;0m INFO 06-25 03:40:06 [gpu_model_runner.py:1595] Starting to load model meta-llama/Llama-3.3-70B-Instruct...
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m INFO 06-25 03:40:06 [gpu_model_runner.py:1595] Starting to load model meta-llama/Llama-3.3-70B-Instruct...
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m INFO 06-25 03:40:06 [gpu_model_runner.py:1600] Loading model from scratch...
+[1;36m(VllmWorker rank=1 pid=51674)[0;0m INFO 06-25 03:40:06 [gpu_model_runner.py:1600] Loading model from scratch...
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m INFO 06-25 03:40:06 [cuda.py:246] FlashInfer failed to import for V1 engine on Blackwell (SM 10.0) GPUs; it is recommended to install FlashInfer for better performance.
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m INFO 06-25 03:40:06 [cuda.py:252] Using Flash Attention backend on V1 engine.
+[1;36m(VllmWorker rank=1 pid=51674)[0;0m INFO 06-25 03:40:06 [cuda.py:246] FlashInfer failed to import for V1 engine on Blackwell (SM 10.0) GPUs; it is recommended to install FlashInfer for better performance.
+[1;36m(VllmWorker rank=1 pid=51674)[0;0m INFO 06-25 03:40:06 [cuda.py:252] Using Flash Attention backend on V1 engine.
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m INFO 06-25 03:40:06 [weight_utils.py:292] Using model weights format ['*.safetensors']
+[1;36m(VllmWorker rank=1 pid=51674)[0;0m INFO 06-25 03:40:06 [weight_utils.py:292] Using model weights format ['*.safetensors']
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m INFO 06-25 03:40:30 [default_loader.py:272] Loading weights took 23.06 seconds
+[1;36m(VllmWorker rank=1 pid=51674)[0;0m INFO 06-25 03:40:30 [default_loader.py:272] Loading weights took 23.02 seconds
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m INFO 06-25 03:40:30 [gpu_model_runner.py:1624] Model loading took 33.8662 GiB and 23.988885 seconds
+[1;36m(VllmWorker rank=1 pid=51674)[0;0m INFO 06-25 03:40:30 [gpu_model_runner.py:1624] Model loading took 33.8662 GiB and 24.065491 seconds
+[1;36m(VllmWorker rank=1 pid=51674)[0;0m INFO 06-25 03:40:45 [backends.py:462] Using cache directory: /home/pirillo_google_com/.cache/vllm/torch_compile_cache/12c35c493a/rank_1_0 for vLLM's torch.compile
+[1;36m(VllmWorker rank=1 pid=51674)[0;0m INFO 06-25 03:40:45 [backends.py:472] Dynamo bytecode transform time: 14.47 s
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m INFO 06-25 03:40:45 [backends.py:462] Using cache directory: /home/pirillo_google_com/.cache/vllm/torch_compile_cache/12c35c493a/rank_0_0 for vLLM's torch.compile
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m INFO 06-25 03:40:45 [backends.py:472] Dynamo bytecode transform time: 14.98 s
+[1;36m(VllmWorker rank=1 pid=51674)[0;0m INFO 06-25 03:40:48 [backends.py:161] Cache the graph of shape None for later use
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m INFO 06-25 03:40:49 [backends.py:161] Cache the graph of shape None for later use
+[1;36m(VllmWorker rank=1 pid=51674)[0;0m INFO 06-25 03:41:35 [backends.py:173] Compiling a graph for general shape takes 48.77 s
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m INFO 06-25 03:41:36 [backends.py:173] Compiling a graph for general shape takes 49.64 s
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m INFO 06-25 03:42:12 [monitor.py:34] torch.compile takes 64.62 s in total
+[1;36m(VllmWorker rank=1 pid=51674)[0;0m INFO 06-25 03:42:12 [monitor.py:34] torch.compile takes 63.24 s in total
+[1;36m(VllmWorker rank=1 pid=51674)[0;0m INFO 06-25 03:42:14 [gpu_worker.py:227] Available KV cache memory: 120.17 GiB
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m INFO 06-25 03:42:14 [gpu_worker.py:227] Available KV cache memory: 120.17 GiB
+INFO 06-25 03:42:14 [kv_cache_utils.py:715] GPU KV cache size: 787,536 tokens
+INFO 06-25 03:42:14 [kv_cache_utils.py:719] Maximum concurrency for 2,048 tokens per request: 384.54x
+INFO 06-25 03:42:14 [kv_cache_utils.py:715] GPU KV cache size: 787,536 tokens
+INFO 06-25 03:42:14 [kv_cache_utils.py:719] Maximum concurrency for 2,048 tokens per request: 384.54x
+[1;36m(VllmWorker rank=1 pid=51674)[0;0m INFO 06-25 03:42:35 [custom_all_reduce.py:196] Registering 10626 cuda graph addresses
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m INFO 06-25 03:42:35 [custom_all_reduce.py:196] Registering 10626 cuda graph addresses
+[1;36m(VllmWorker rank=1 pid=51674)[0;0m INFO 06-25 03:42:35 [gpu_model_runner.py:2048] Graph capturing finished in 21 secs, took 1.48 GiB
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m INFO 06-25 03:42:35 [gpu_model_runner.py:2048] Graph capturing finished in 21 secs, took 1.48 GiB
+INFO 06-25 03:42:35 [core.py:171] init engine (profile, create kv cache, warmup model) took 124.83 seconds
+Throughput: 4.28 requests/s, 8765.34 total tokens/s, 4384.46 output tokens/s
+Total num prompt tokens:  204633
+Total num output tokens:  204800
+
+--- STDERR ---
+huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+To disable this warning, you can either:
+	- Avoid using `tokenizers` before the fork if possible
+	- Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m Loading safetensors checkpoint shards:   0% Completed | 0/30 [00:00<?, ?it/s]
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m Loading safetensors checkpoint shards:   3% Completed | 1/30 [00:00<00:20,  1.40it/s]
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m Loading safetensors checkpoint shards:   7% Completed | 2/30 [00:01<00:21,  1.29it/s]
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m Loading safetensors checkpoint shards:  10% Completed | 3/30 [00:02<00:21,  1.24it/s]
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m Loading safetensors checkpoint shards:  13% Completed | 4/30 [00:03<00:21,  1.24it/s]
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m Loading safetensors checkpoint shards:  17% Completed | 5/30 [00:04<00:20,  1.22it/s]
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m Loading safetensors checkpoint shards:  20% Completed | 6/30 [00:04<00:19,  1.23it/s]
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m Loading safetensors checkpoint shards:  23% Completed | 7/30 [00:05<00:16,  1.36it/s]
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m Loading safetensors checkpoint shards:  27% Completed | 8/30 [00:06<00:16,  1.31it/s]
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m Loading safetensors checkpoint shards:  30% Completed | 9/30 [00:07<00:16,  1.27it/s]
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m Loading safetensors checkpoint shards:  33% Completed | 10/30 [00:07<00:16,  1.25it/s]
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m Loading safetensors checkpoint shards:  37% Completed | 11/30 [00:08<00:14,  1.29it/s]
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m Loading safetensors checkpoint shards:  40% Completed | 12/30 [00:09<00:13,  1.32it/s]
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m Loading safetensors checkpoint shards:  43% Completed | 13/30 [00:10<00:13,  1.30it/s]
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m Loading safetensors checkpoint shards:  47% Completed | 14/30 [00:10<00:12,  1.28it/s]
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m Loading safetensors checkpoint shards:  50% Completed | 15/30 [00:11<00:11,  1.27it/s]
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m Loading safetensors checkpoint shards:  53% Completed | 16/30 [00:12<00:10,  1.31it/s]
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m Loading safetensors checkpoint shards:  57% Completed | 17/30 [00:13<00:10,  1.29it/s]
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m Loading safetensors checkpoint shards:  60% Completed | 18/30 [00:14<00:09,  1.26it/s]
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m Loading safetensors checkpoint shards:  63% Completed | 19/30 [00:14<00:08,  1.26it/s]
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m Loading safetensors checkpoint shards:  67% Completed | 20/30 [00:15<00:07,  1.26it/s]
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m Loading safetensors checkpoint shards:  70% Completed | 21/30 [00:16<00:07,  1.25it/s]
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m Loading safetensors checkpoint shards:  73% Completed | 22/30 [00:17<00:06,  1.30it/s]
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m Loading safetensors checkpoint shards:  77% Completed | 23/30 [00:17<00:04,  1.65it/s]
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m Loading safetensors checkpoint shards:  80% Completed | 24/30 [00:18<00:03,  1.53it/s]
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m Loading safetensors checkpoint shards:  83% Completed | 25/30 [00:18<00:03,  1.43it/s]
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m Loading safetensors checkpoint shards:  87% Completed | 26/30 [00:19<00:02,  1.36it/s]
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m Loading safetensors checkpoint shards:  90% Completed | 27/30 [00:20<00:02,  1.31it/s]
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m Loading safetensors checkpoint shards:  93% Completed | 28/30 [00:21<00:01,  1.29it/s]
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m Loading safetensors checkpoint shards:  97% Completed | 29/30 [00:22<00:00,  1.28it/s]
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m Loading safetensors checkpoint shards: 100% Completed | 30/30 [00:23<00:00,  1.27it/s]
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m Loading safetensors checkpoint shards: 100% Completed | 30/30 [00:23<00:00,  1.30it/s]
+[1;36m(VllmWorker rank=0 pid=51673)[0;0m 
+Adding requests:   0%|          | 0/200 [00:00<?, ?it/s]Adding requests:  10%|█         | 20/200 [00:00<00:00, 199.95it/s]Adding requests:  22%|██▎       | 45/200 [00:00<00:00, 228.58it/s]Adding requests:  38%|███▊      | 76/200 [00:00<00:00, 263.83it/s]Adding requests:  55%|█████▍    | 109/200 [00:00<00:00, 289.33it/s]Adding requests:  78%|███████▊  | 155/200 [00:00<00:00, 348.48it/s]Adding requests: 100%|██████████| 200/200 [00:00<00:00, 331.83it/s]
+Processed prompts:   0%|          | 0/200 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   0%|          | 1/200 [00:45<2:31:33, 45.70s/it, est. speed input: 22.41 toks/s, output: 22.41 toks/s]Processed prompts:  14%|█▍        | 29/200 [00:45<03:11,  1.12s/it, est. speed input: 648.16 toks/s, output: 648.16 toks/s]Processed prompts:  38%|███▊      | 77/200 [00:45<00:40,  3.02it/s, est. speed input: 1717.15 toks/s, output: 1717.15 toks/s]Processed prompts:  70%|███████   | 141/200 [00:46<00:08,  7.01it/s, est. speed input: 3132.67 toks/s, output: 3136.25 toks/s]Processed prompts: 100%|██████████| 200/200 [00:46<00:00,  4.34it/s, est. speed input: 4438.29 toks/s, output: 4441.91 toks/s]

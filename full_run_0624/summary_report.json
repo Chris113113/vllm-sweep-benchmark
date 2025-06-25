@@ -1,0 +1,206 @@
+[
+    {
+        "run_name": "Llama-3.1-8B-Instruct_TP-1_ISL-256_OSL-256",
+        "status": "TERMINATED_DUE_TO_ERROR"
+    },
+    {
+        "run_name": "Llama-3.1-8B-Instruct_TP-2_ISL-256_OSL-256",
+        "status": "TERMINATED_DUE_TO_ERROR"
+    },
+    {
+        "run_name": "Llama-3.1-8B-Instruct_TP-1_ISL-1024_OSL-1024",
+        "status": "TERMINATED_DUE_TO_ERROR"
+    },
+    {
+        "run_name": "Llama-3.1-8B-Instruct_TP-2_ISL-1024_OSL-1024",
+        "status": "TERMINATED_DUE_TO_ERROR"
+    },
+    {
+        "run_name": "Llama-3.1-8B-Instruct_TP-1_ISL-4096_OSL-4096",
+        "status": "TERMINATED_DUE_TO_ERROR"
+    },
+    {
+        "run_name": "Llama-3.1-8B-Instruct_TP-2_ISL-4096_OSL-4096",
+        "status": "TERMINATED_DUE_TO_ERROR"
+    },
+    {
+        "run_name": "Gemma-3-27B-IT_TP-1_ISL-256_OSL-256",
+        "status": "TERMINATED_DUE_TO_ERROR"
+    },
+    {
+        "run_name": "Gemma-3-27B-IT_TP-2_ISL-256_OSL-256",
+        "status": "TERMINATED_DUE_TO_ERROR"
+    },
+    {
+        "run_name": "Gemma-3-27B-IT_TP-4_ISL-256_OSL-256",
+        "status": "TERMINATED_DUE_TO_ERROR"
+    },
+    {
+        "run_name": "Gemma-3-27B-IT_TP-1_ISL-1024_OSL-1024",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "Gemma-3-27B-IT_TP-2_ISL-1024_OSL-1024",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "Gemma-3-27B-IT_TP-4_ISL-1024_OSL-1024",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "Gemma-3-27B-IT_TP-1_ISL-4096_OSL-4096",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "Gemma-3-27B-IT_TP-2_ISL-4096_OSL-4096",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "Gemma-3-27B-IT_TP-4_ISL-4096_OSL-4096",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "Qwen3-32B_TP-1_ISL-256_OSL-256",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "Qwen3-32B_TP-2_ISL-256_OSL-256",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "Qwen3-32B_TP-4_ISL-256_OSL-256",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "Qwen3-32B_TP-1_ISL-1024_OSL-1024",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "Qwen3-32B_TP-2_ISL-1024_OSL-1024",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "Qwen3-32B_TP-4_ISL-1024_OSL-1024",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "Qwen3-32B_TP-1_ISL-4096_OSL-4096",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "Qwen3-32B_TP-2_ISL-4096_OSL-4096",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "Qwen3-32B_TP-4_ISL-4096_OSL-4096",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "Qwen3-4B_TP-1_ISL-256_OSL-256",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "Qwen3-4B_TP-2_ISL-256_OSL-256",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "Qwen3-4B_TP-1_ISL-1024_OSL-1024",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "Qwen3-4B_TP-2_ISL-1024_OSL-1024",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "Qwen3-4B_TP-1_ISL-4096_OSL-4096",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "Qwen3-4B_TP-2_ISL-4096_OSL-4096",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "Llama-4-Maverick-17B-128E-Instruct_TP-1_ISL-256_OSL-256",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "Llama-4-Maverick-17B-128E-Instruct_TP-2_ISL-256_OSL-256",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "Llama-4-Maverick-17B-128E-Instruct_TP-4_ISL-256_OSL-256",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "Llama-4-Maverick-17B-128E-Instruct_TP-1_ISL-1024_OSL-1024",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "Llama-4-Maverick-17B-128E-Instruct_TP-2_ISL-1024_OSL-1024",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "Llama-4-Maverick-17B-128E-Instruct_TP-4_ISL-1024_OSL-1024",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "Llama-4-Maverick-17B-128E-Instruct_TP-1_ISL-4096_OSL-4096",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "Llama-4-Maverick-17B-128E-Instruct_TP-2_ISL-4096_OSL-4096",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "Llama-4-Maverick-17B-128E-Instruct_TP-4_ISL-4096_OSL-4096",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "DeepSeek-R1-671B_TP-2_ISL-256_OSL-256",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "DeepSeek-R1-671B_TP-4_ISL-256_OSL-256",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "DeepSeek-R1-671B_TP-8_ISL-256_OSL-256",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "DeepSeek-R1-671B_TP-2_ISL-1000_OSL-1000",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "DeepSeek-R1-671B_TP-4_ISL-1000_OSL-1000",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "DeepSeek-R1-671B_TP-8_ISL-1000_OSL-1000",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "Llama-Guard-4-12B_TP-1_ISL-256_OSL-64",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "Llama-Guard-4-12B_TP-2_ISL-256_OSL-64",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "Llama-Guard-4-12B_TP-1_ISL-1024_OSL-64",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "Llama-Guard-4-12B_TP-2_ISL-1024_OSL-64",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "Llama-Guard-4-12B_TP-1_ISL-5000_OSL-64",
+        "status": "NOT_STARTED"
+    },
+    {
+        "run_name": "Llama-Guard-4-12B_TP-2_ISL-5000_OSL-64",
+        "status": "NOT_STARTED"
+    }
+]

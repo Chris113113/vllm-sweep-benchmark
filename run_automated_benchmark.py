@@ -12,6 +12,10 @@ import argparse
 import re
 import io
 from datetime import datetime
+import queue
+import concurrent.futures
+import queue
+import concurrent.futures
 
 # --- Configuration ---
 SERVER_STARTUP_TIMEOUT = 300
@@ -23,6 +27,21 @@ RETRYABLE_ERROR_STRINGS = ["uncorrectable NVLink error"]
 PROCESS_CLEANUP_TIMEOUT = 15
 
 # --- Utility Functions ---
+def get_gpu_count():
+    """Returns the number of available GPUs by querying nvidia-smi."""
+    try:
+        result = subprocess.run(
+            ["nvidia-smi", "--query-gpu=count", "--format=csv,noheader"],
+            capture_output=True, text=True, check=True
+        )
+        # The command can return the count for each GPU on a new line.
+        # We just need the value from the first line.
+        gpu_count_str = result.stdout.strip().split('\n')[0]
+        return int(gpu_count_str)
+    except (FileNotFoundError, subprocess.CalledProcessError, ValueError, IndexError) as e:
+        print(f"[WARNING] Could not query nvidia-smi for GPU count: {e}. Falling back to sequential execution.")
+        return 0
+
 def sanitize_filename(name):
     s = re.sub(r'[\\/*?:"<>|]', "", name)
     s = s.replace(" ", "_")
@@ -47,72 +66,115 @@ def wait_for_server(timeout):
     print(f"\n[{datetime.now().strftime('%H:%M:%S.%f')[:-3]}] Error: Server did not become ready in time.")
     return False
 
+# --- GPU Resource Management ---
+class GPUManager:
+    """A thread-safe manager to allocate and release GPUs."""
+    def __init__(self, num_gpus):
+        self.num_gpus = num_gpus
+        self.gpus = list(range(num_gpus))
+        self.available = [True] * num_gpus
+        self.lock = threading.Lock()
+
+    def acquire(self, count):
+        """Acquires a contiguous block of 'count' GPUs."""
+        with self.lock:
+            for i in range(self.num_gpus - count + 1):
+                if all(self.available[i:i+count]):
+                    self.available[i:i+count] = [False] * count
+                    gpu_ids = list(range(i, i + count))
+                    print(f"[{datetime.now().strftime('%H:%M:%S.%f')[:-3]}] [GPUManager]: Acquired GPUs {gpu_ids}")
+                    return gpu_ids
+            return None
+
+    def release(self, gpu_ids):
+        """Releases a list of GPUs, making them available again."""
+        with self.lock:
+            for gpu_id in gpu_ids:
+                self.available[gpu_id] = True
+            print(f"[{datetime.now().strftime('%H:%M:%S.%f')[:-3]}] [GPUManager]: Released GPUs {gpu_ids}")
+
+
+
+
 def stream_and_capture_output(pipe, prefix, captured_lines_list, fatal_error_event=None, fatal_error_strings=None, retryable_error_event=None, retryable_error_strings=None):
     """
-    Reads a subprocess's output stream, buffering until a newline or carriage return.
-    This allows progress bars (which use \r) to update in place, while still capturing
-    and prefixing full lines of output for logging.
+    Reads a subprocess's output stream, intelligently handling carriage returns (\r)
+    to allow in-place updates for progress bars, while correctly prefixing new lines.
     """
     try:
-        # Use a wrapper to treat the binary pipe as a text stream.
         with io.TextIOWrapper(pipe, encoding='utf-8', errors='replace') as text_stream:
-            buffer = ""
+            on_new_line = True
             for char in iter(lambda: text_stream.read(1), ''):
                 if not char:
                     break  # End of stream
-                
-                buffer += char
-                
-                # Process the buffer when a line-ending character is found.
-                # This handles both normal log lines (\n) and updating lines like progress bars (\r).
-                if char == '\n' or char == '\r':
+
+                # If we are on a new line, print the prefix.
+                if on_new_line:
                     timestamp = datetime.now().strftime('%H:%M:%S.%f')[:-3]
-                    
-                    # Write the prefix and the buffered content. The buffer already contains the
-                    # correct line ending (\n or \r), so we write it directly.
-                    sys.stdout.write(f"[{timestamp}] [{prefix}]: {buffer}")
-                    sys.stdout.flush()
+                    sys.stdout.write(f"[{timestamp}] [{prefix}]: ")
+                    on_new_line = False
+                
+                # Write the character from the subprocess.
+                sys.stdout.write(char)
+                
+                # Buffer the character for the log file.
+                # We handle the buffer on a line-by-line basis for error checking.
+                if 'line_buffer' not in locals():
+                    line_buffer = ""
+                line_buffer += char
 
-                    captured_lines_list.append(buffer)
-                    
-                    # Check for error strings in the completed line.
-                    if fatal_error_event and fatal_error_strings:
-                        if any(e in buffer for e in fatal_error_strings):
-                            fatal_error_event.set()
-                    if retryable_error_event and retryable_error_strings:
-                        if any(e in buffer for e in retryable_error_strings):
-                            retryable_error_event.set()
-                    
-                    # Reset buffer after processing the line.
-                    buffer = ""
+                # If the character is a newline, we are back to a new line.
+                # Also process the buffered line for logs and errors.
+                if char == '\n':
+                    on_new_line = True
+                    captured_lines_list.append(line_buffer)
+                    # Error checking
+                    if fatal_error_event and fatal_error_strings and any(e in line_buffer for e in fatal_error_strings):
+                        fatal_error_event.set()
+                    if retryable_error_event and retryable_error_strings and any(e in line_buffer for e in retryable_error_strings):
+                        retryable_error_event.set()
+                    line_buffer = ""
 
-            # Handle any remaining text in the buffer that doesn't end with a newline.
-            if buffer:
-                timestamp = datetime.now().strftime('%H:%M:%S.%f')[:-3]
-                sys.stdout.write(f"[{timestamp}] [{prefix}]: {buffer}\n") # Add a final newline for clarity
                 sys.stdout.flush()
-                captured_lines_list.append(buffer)
+
+            # After the loop, if there's any content left in the buffer,
+            # it means the process output didn't end with a newline.
+            if 'line_buffer' in locals() and line_buffer:
+                captured_lines_list.append(line_buffer)
+                # Final error check on the remaining buffer
+                if fatal_error_event and fatal_error_strings and any(e in line_buffer for e in fatal_error_strings):
+                    fatal_error_event.set()
+                if retryable_error_event and retryable_error_strings and any(e in line_buffer for e in retryable_error_strings):
+                    retryable_error_event.set()
+                # Add a final newline to the console for clean termination.
+                sys.stdout.write('\n')
+                sys.stdout.flush()
 
     except Exception as e:
         timestamp = datetime.now().strftime('%H:%M:%S.%f')[:-3]
         print(f"[{timestamp}] [STREAM_ERROR]: An error occurred in the stream reader: {e}", flush=True)
 
-def execute_and_monitor_process(command, job_name, log_prefix, output_dir, log_filename_base, fatal_error_strings=None, retryable_error_strings=None):
+def execute_and_monitor_process(command, job_name, log_prefix, output_dir, log_filename_base, gpu_ids=None, fatal_error_strings=None, retryable_error_strings=None):
     """
-    A helper function to execute a subprocess, stream its logs,
+    A helper function to execute a subprocess on a specific set of GPUs, stream its logs,
     monitor for errors, and terminate early if needed.
-    Returns the full output and a status indicating success, fatal error, or retryable error.
     """
     fatal_error_event = threading.Event()
     retryable_error_event = threading.Event()
     
-    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=os.setsid)
+    env = os.environ.copy()
+    if gpu_ids:
+        env['CUDA_VISIBLE_DEVICES'] = ",".join(map(str, gpu_ids))
+        job_name_with_gpu = f"{job_name}_GPUs{gpu_ids}"
+    else:
+        job_name_with_gpu = job_name
+
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=os.setsid, env=env)
     
     stdout_lines, stderr_lines = [], []
     
-    # Combine job name and log prefix for a more descriptive log output
-    stdout_prefix = f"{job_name}:{log_prefix}_STDOUT"
-    stderr_prefix = f"{job_name}:{log_prefix}_STDERR"
+    stdout_prefix = f"{job_name_with_gpu}:{log_prefix}_STDOUT"
+    stderr_prefix = f"{job_name_with_gpu}:{log_prefix}_STDERR"
     
     stream_args = (
         process.stdout, stdout_prefix, stdout_lines,
@@ -128,11 +190,11 @@ def execute_and_monitor_process(command, job_name, log_prefix, output_dir, log_f
 
     while process.poll() is None:
         if retryable_error_event.is_set():
-            print(f"[{datetime.now().strftime('%H:%M:%S.%f')[:-3]}] [ORCHESTRATOR]: RETRYABLE ERROR DETECTED. Terminating process group {process.pid} with SIGKILL.")
+            print(f"[{datetime.now().strftime('%H:%M:%S.%f')[:-3]}] [ORCHESTRATOR]: RETRYABLE ERROR DETECTED on {job_name_with_gpu}. Terminating process group {process.pid} with SIGKILL.")
             os.killpg(os.getpgid(process.pid), signal.SIGKILL)
             break
         if fatal_error_event.is_set():
-            print(f"[{datetime.now().strftime('%H:%M:%S.%f')[:-3]}] [ORCHESTRATOR]: FATAL ERROR DETECTED. Terminating process group {process.pid} with SIGKILL.")
+            print(f"[{datetime.now().strftime('%H:%M:%S.%f')[:-3]}] [ORCHESTRATOR]: FATAL ERROR DETECTED on {job_name_with_gpu}. Terminating process group {process.pid} with SIGKILL.")
             os.killpg(os.getpgid(process.pid), signal.SIGKILL)
             break
         time.sleep(0.1)
@@ -140,7 +202,7 @@ def execute_and_monitor_process(command, job_name, log_prefix, output_dir, log_f
     try:
         process.wait(timeout=PROCESS_CLEANUP_TIMEOUT)
     except subprocess.TimeoutExpired:
-        print(f"[{datetime.now().strftime('%H:%M:%S.%f')[:-3]}] [WARNING]: Subprocess {process.pid} did not terminate gracefully after {PROCESS_CLEANUP_TIMEOUT}s. Forcing final kill.")
+        print(f"[{datetime.now().strftime('%H:%M:%S.%f')[:-3]}] [WARNING]: Subprocess {process.pid} ({job_name_with_gpu}) did not terminate gracefully after {PROCESS_CLEANUP_TIMEOUT}s. Forcing final kill.")
         os.killpg(os.getpgid(process.pid), signal.SIGKILL)
 
     stdout_thread.join(timeout=PROCESS_CLEANUP_TIMEOUT)
@@ -153,7 +215,7 @@ def execute_and_monitor_process(command, job_name, log_prefix, output_dir, log_f
         f.write("\n--- STDERR ---\n")
         f.write("".join(stderr_lines))
     
-    print(f"   Full logs for this run saved to '{log_filepath}'")
+    print(f"   Full logs for {job_name_with_gpu} saved to '{log_filepath}'")
     
     status = "success"
     if retryable_error_event.is_set():
@@ -196,18 +258,19 @@ def run_client_benchmark(client_config, run_index, output_dir):
             return {"run_name": run_name, "status": "CLIENT_JSON_ERROR"}
     return {"run_name": run_name, "status": "CLIENT_NO_OUTPUT"}
 
-def run_vllm_throughput_benchmark(run_config, run_index, output_dir):
+def run_vllm_throughput_benchmark(run_config, run_index, output_dir, gpu_ids=None):
     run_name = run_config.get('name', f'vLLM_Official_Run_{run_index}')
     args_list = shlex.split(run_config.get('args', ''))
     
     print("\n" + "-"*80)
-    print(f"🏁 ({run_index}) Running Official vLLM Throughput Benchmark: '{run_name}'")
+    print(f"🏁 ({run_index}) Running Official vLLM Throughput Benchmark: '{run_name}' on GPUs {gpu_ids}")
     
     command = ['python', VLLM_BENCHMARK_SCRIPT_PATH] + args_list
     log_filename = f"{run_index}_{sanitize_filename(run_name)}_vllm_script.log"
 
     full_output, exec_status = execute_and_monitor_process(
         command, run_name, "VLLM_BENCH", output_dir, log_filename, 
+        gpu_ids=gpu_ids,
         fatal_error_strings=FATAL_ERROR_STRINGS,
         retryable_error_strings=RETRYABLE_ERROR_STRINGS
     )
@@ -266,6 +329,66 @@ def update_summary_file(filepath, new_result):
     if not found: all_results.append(new_result)
     with open(filepath, 'w') as f: json.dump(all_results, f, indent=4)
 
+def print_run_plan(jobs):
+    """Prints a formatted table of the benchmark execution plan."""
+    print("\n" + "#"*80)
+    print("# Benchmark Execution Plan")
+    print("#"*80)
+    
+    if not jobs:
+        print("# No jobs planned.")
+        print("#"*80)
+        return
+        
+    headers = ["Num", "Type", "TP", "Name", "Arguments"]
+    max_name_len = max([len(j['config'].get('name', 'N/A')) for j in jobs] + [len(headers[3])])
+
+    # Print table header
+    header_line = f"# {headers[0]:<4}| {headers[1]:<11}| {headers[2]:<3}| {headers[3]:<{max_name_len}} | {headers[4]}"
+    print(header_line)
+    print("#" + "-" * (len(header_line) - 1))
+
+    # Print each job as a row
+    for i, job in enumerate(jobs):
+        config = job['config']
+        job_type = job['type']
+        name = config.get('name', 'N/A')
+        
+        if job_type == 'standalone':
+            tp_size = config.get('tensor_parallel_size', 1)
+            details = config.get('args', '')
+        elif job_type == 'custom':
+            tp_size = '-'
+            details = config.get('client_args', '')
+        else:
+            tp_size = '-'
+            details = ''
+            
+        print(f"# {i+1:<4}| {job_type:<11}| {tp_size:<3}| {name:<{max_name_len}} | {details}")
+
+    print("#"*80)
+
+def run_job_wrapper(job, run_index, gpu_manager, args):
+
+    """
+    A wrapper function that acquires GPUs, runs a benchmark job,
+    and ensures the GPUs are released.
+    """
+    tp_size = job['config'].get('tensor_parallel_size', 1)
+    
+    gpu_ids = None
+    while gpu_ids is None:
+        gpu_ids = gpu_manager.acquire(tp_size)
+        if gpu_ids is None:
+            time.sleep(1) # Wait for GPUs to become available
+
+    try:
+        result = run_vllm_throughput_benchmark(job['config'], run_index, args.output_dir, gpu_ids=gpu_ids)
+        return result
+    finally:
+        gpu_manager.release(gpu_ids)
+
+
 def main():
     parser = argparse.ArgumentParser(description="VLLM Automated Benchmark Runner")
     parser.add_argument("config_file", help="Path to the YAML configuration file for benchmarks.")
@@ -277,86 +400,128 @@ def main():
     os.makedirs(args.output_dir, exist_ok=True)
     print(f"Results will be saved to directory: '{args.output_dir}'")
     with open(args.config_file, 'r') as f: config = yaml.safe_load(f)
-    
-    # --- Generate full list of all planned jobs ---
-    planned_jobs = []
-    if 'server_config' in config and 'client_runs' in config:
-        for client_config in config.get('client_runs', []):
-            planned_jobs.append({'type': 'custom', 'config': client_config})
-    if 'standalone_runs' in config:
-        for run_config in config.get('standalone_runs', []):
-            if run_config.get('mode') != 'vllm_throughput': continue
-            base_name, base_args_str = run_config.get('name', 'Standalone_Run'), run_config.get('args', '')
-            tp_sizes, length_configs = run_config.get('tensor_parallel_sizes', [None]), run_config.get('length_configs', [None])
-            for length_conf in length_configs:
-                for tp in tp_sizes:
-                    name_parts, args_parts = [base_name], [base_args_str]
-                    if tp: name_parts.append(f"TP-{tp}"); args_parts.append(f"--tensor-parallel-size {tp}")
-                    if length_conf:
-                        input_len, output_len = length_conf.get('input_len'), length_conf.get('output_len')
-                        if input_len is not None and output_len is not None:
-                            max_len = input_len + output_len
-                            name_parts.append(f"ISL-{input_len}_OSL-{output_len}")
-                            args_parts.append(f"--input-len {input_len} --output-len {output_len} --max-model-len {max_len}")
-                        else: continue
-                    final_name, final_args = "_".join(name_parts), " ".join(filter(None, args_parts))
-                    if final_args: planned_jobs.append({'type': 'standalone', 'config': {'name': final_name, 'args': final_args, 'mode': 'vllm_throughput'}})
-    
-    if not planned_jobs: print("No valid benchmark runs found in config file."); return
 
-    # --- Initialize summary report ---
+    # --- Job Planning ---
+    server_jobs = [
+        {'type': 'custom', 'config': client_config}
+        for client_config in config.get('client_runs', [])
+        if 'server_config' in config
+    ]
+    
+    standalone_jobs = []
+    for run_config in config.get('standalone_runs', []):
+        if run_config.get('mode') != 'vllm_throughput':
+            continue
+        
+        base_name = run_config.get('name', 'Standalone_Run')
+        base_args_str = run_config.get('args', '')
+        tp_sizes = run_config.get('tensor_parallel_sizes', [1]) # Default to 1 if not specified
+        length_configs = run_config.get('length_configs', [{}])
+
+        for length_conf in length_configs:
+            for tp in tp_sizes:
+                name_parts = [base_name, f"TP-{tp}"]
+                args_parts = [base_args_str, f"--tensor-parallel-size {tp}"]
+                
+                input_len = length_conf.get('input_len')
+                output_len = length_conf.get('output_len')
+
+                if input_len is not None and output_len is not None:
+                    max_len = input_len + output_len
+                    name_parts.append(f"ISL-{input_len}_OSL-{output_len}")
+                    args_parts.append(f"--input-len {input_len} --output-len {output_len} --max-model-len {max_len}")
+
+                final_name = "_".join(name_parts)
+                final_args = " ".join(filter(None, args_parts))
+                
+                standalone_jobs.append({
+                    'type': 'standalone',
+                    'config': {
+                        'name': final_name,
+                        'args': final_args,
+                        'mode': 'vllm_throughput',
+                        'tensor_parallel_size': tp
+                    }
+                })
+
+    # Sort standalone jobs by tensor parallel size (ascending)
+    standalone_jobs.sort(key=lambda j: j['config'].get('tensor_parallel_size', 1))
+    
+    all_jobs = standalone_jobs + server_jobs
+    if not all_jobs:
+        print("No valid benchmark runs found in config file.")
+        return
+
+    # --- Print Run Plan ---
+    print_run_plan(all_jobs)
+
+    # --- Initialize Summary Report ---
     report_filepath = os.path.join(args.output_dir, "summary_report.json")
-    initial_results = [{"run_name": job['config'].get('name'), "status": "NOT_STARTED"} for job in planned_jobs]
-    with open(report_filepath, 'w') as f: json.dump(initial_results, f, indent=4)
+    initial_results = [{"run_name": job['config'].get('name'), "status": "NOT_STARTED"} for job in all_jobs]
+    with open(report_filepath, 'w') as f:
+        json.dump(initial_results, f, indent=4)
     print(f"✅ Initial summary report created at '{report_filepath}' with {len(initial_results)} planned runs.")
 
-    # --- Execute all planned jobs ---
-    run_counter = 0
-    server_process = None
-    try:
-        for i, job in enumerate(planned_jobs):
-            run_counter += 1
+    # --- Execute Standalone Jobs in Parallel ---
+    num_gpus = get_gpu_count()
+    if num_gpus > 0 and standalone_jobs:
+        print(f"\n" + "#"*80)
+        print(f"# Detected {num_gpus} GPUs. Running {len(standalone_jobs)} standalone jobs in parallel.")
+        print("#"*80)
+        
+        gpu_manager = GPUManager(num_gpus)
+        # Use number of GPUs as max_workers to ensure we can saturate the hardware
+        with concurrent.futures.ThreadPoolExecutor(max_workers=num_gpus) as executor:
+            # Map each job to the wrapper function
+            future_to_job = {
+                executor.submit(run_job_wrapper, job, i + 1, gpu_manager, args): job
+                for i, job in enumerate(standalone_jobs)
+            }
             
-            current_retry = 0
-            while current_retry <= args.max_retries:
-                print("\n" + "#"*80); print(f"# Starting Benchmark {run_counter}/{len(planned_jobs)} (Attempt {current_retry + 1}/{args.max_retries + 1})"); print("#"*80)
-                
-                result = None
-                if job['type'] == 'custom':
-                    if server_process is None: # Start server if not already running
-                        server_args = shlex.split(config['server_config'].get('server_args', ''))
-                        server_process = subprocess.Popen(['./start_server.sh'] + server_args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=os.setsid)
-                        log_thread = threading.Thread(target=stream_and_capture_output, args=(server_process.stdout, "SERVER", []), daemon=True); log_thread.start()
-                        if not wait_for_server(SERVER_STARTUP_TIMEOUT):
-                            print("🚨 Server failed to start. Cannot run custom benchmarks."); break
+            for future in concurrent.futures.as_completed(future_to_job):
+                job = future_to_job[future]
+                try:
+                    result = future.result()
+                    if result:
+                        update_summary_file(report_filepath, result)
+                except Exception as exc:
+                    print(f"🚨 Job '{job['config']['name']}' generated an exception: {exc}")
+                    update_summary_file(report_filepath, {"run_name": job['config']['name'], "status": "EXCEPTION"})
+
+    # --- Execute Server/Client Jobs Sequentially ---
+    if server_jobs:
+        print("\n" + "#"*80)
+        print(f"# Running {len(server_jobs)} server/client jobs sequentially.")
+        print("#"*80)
+        
+        server_process = None
+        try:
+            # Start the server once
+            server_args = shlex.split(config['server_config'].get('server_args', ''))
+            server_process = subprocess.Popen(['./start_server.sh'] + server_args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=os.setsid)
+            log_thread = threading.Thread(target=stream_and_capture_output, args=(server_process.stdout, "SERVER", []), daemon=True)
+            log_thread.start()
+            
+            if not wait_for_server(SERVER_STARTUP_TIMEOUT):
+                print("🚨 Server failed to start. Cannot run custom benchmarks.")
+            else:
+                # Run all client benchmarks against the single server
+                for i, job in enumerate(server_jobs):
+                    run_counter = len(standalone_jobs) + i + 1
                     result = run_client_benchmark(job['config'], run_counter, args.output_dir)
-                
-                elif job['type'] == 'standalone':
-                    result = run_vllm_throughput_benchmark(job['config'], run_counter, args.output_dir)
-
-                if result:
-                    update_summary_file(report_filepath, result)
-                
-                if result and result.get("status") == "RETRYABLE_ERROR":
-                    current_retry += 1
-                    if current_retry <= args.max_retries:
-                        print(f"🚨 Run failed with a retryable error. Retrying in {args.retry_delay} seconds...")
-                        time.sleep(args.retry_delay)
-                    else:
-                        print("🚨 Run failed with a retryable error. Max retries reached.")
-                        break 
-                else:
-                    # Break the retry loop if the run was successful or failed with a non-retryable error
-                    break
-
-    finally:
-        if server_process and server_process.poll() is None:
-            print("\n" + "="*80); print("🛑 Shutting down server.");
-            os.killpg(os.getpgid(server_process.pid), signal.SIGTERM); server_process.wait(timeout=PROCESS_CLEANUP_TIMEOUT)
+                    if result:
+                        update_summary_file(report_filepath, result)
+        finally:
+            if server_process and server_process.poll() is None:
+                print("\n" + "="*80)
+                print("🛑 Shutting down server.")
+                os.killpg(os.getpgid(server_process.pid), signal.SIGTERM)
+                server_process.wait(timeout=PROCESS_CLEANUP_TIMEOUT)
 
     print("\n" + "#"*80)
     print(f"✅ All benchmark runs complete. Final report is at '{report_filepath}'")
     print("#"*80)
+
 
 if __name__ == "__main__":
     main()

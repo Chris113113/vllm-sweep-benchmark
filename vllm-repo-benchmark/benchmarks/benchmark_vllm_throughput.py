@@ -113,196 +113,6 @@ def run_vllm(
     return end - start, outputs
 
 
-def run_vllm_chat(
-    requests: list[SampleRequest],
-    n: int,
-    engine_args: EngineArgs,
-    disable_detokenize: bool = False,
-) -> tuple[float, list[RequestOutput]]:
-    """
-    Run vLLM chat benchmark. This function is recommended ONLY for benchmarking
-    multimodal models as it properly handles multimodal inputs and chat
-    formatting. For non-multimodal models, use run_vllm() instead.
-    """
-    from vllm import LLM, SamplingParams
-
-    llm = LLM(**dataclasses.asdict(engine_args))
-
-    assert all(
-        llm.llm_engine.model_config.max_model_len
-        >= (request.prompt_len + request.expected_output_len)
-        for request in requests
-    ), (
-        "Please ensure that max_model_len is greater than the sum of "
-        "prompt_len and expected_output_len for all requests."
-    )
-
-    prompts = []
-    sampling_params: list[SamplingParams] = []
-    for request in requests:
-        prompts.append(request.prompt)
-        sampling_params.append(
-            SamplingParams(
-                n=n,
-                temperature=1.0,
-                top_p=1.0,
-                ignore_eos=True,
-                max_tokens=request.expected_output_len,
-                detokenize=not disable_detokenize,
-            )
-        )
-    start = time.perf_counter()
-    outputs = llm.chat(prompts, sampling_params, use_tqdm=True)
-    end = time.perf_counter()
-    return end - start, outputs
-
-
-async def run_vllm_async(
-    requests: list[SampleRequest],
-    n: int,
-    engine_args: AsyncEngineArgs,
-    disable_frontend_multiprocessing: bool = False,
-    disable_detokenize: bool = False,
-) -> float:
-    from vllm import SamplingParams
-
-    async with build_async_engine_client_from_engine_args(
-        engine_args, disable_frontend_multiprocessing
-    ) as llm:
-        model_config = await llm.get_model_config()
-        assert all(
-            model_config.max_model_len
-            >= (request.prompt_len + request.expected_output_len)
-            for request in requests
-        ), (
-            "Please ensure that max_model_len is greater than the sum of"
-            " prompt_len and expected_output_len for all requests."
-        )
-
-        # Add the requests to the engine.
-        prompts: list[Union[TextPrompt, TokensPrompt]] = []
-        sampling_params: list[SamplingParams] = []
-        lora_requests: list[Optional[LoRARequest]] = []
-        for request in requests:
-            prompts.append(
-                TokensPrompt(
-                    prompt_token_ids=request.prompt["prompt_token_ids"],
-                    multi_modal_data=request.multi_modal_data,
-                )
-                if "prompt_token_ids" in request.prompt
-                else TextPrompt(
-                    prompt=request.prompt, multi_modal_data=request.multi_modal_data
-                )
-            )
-            sampling_params.append(
-                SamplingParams(
-                    n=n,
-                    temperature=1.0,
-                    top_p=1.0,
-                    ignore_eos=True,
-                    max_tokens=request.expected_output_len,
-                    detokenize=not disable_detokenize,
-                )
-            )
-            lora_requests.append(request.lora_request)
-
-        generators = []
-        start = time.perf_counter()
-        for i, (prompt, sp, lr) in enumerate(
-            zip(prompts, sampling_params, lora_requests)
-        ):
-            generator = llm.generate(prompt, sp, lora_request=lr, request_id=f"test{i}")
-            generators.append(generator)
-        all_gens = merge_async_iterators(*generators)
-        async for i, res in all_gens:
-            pass
-        end = time.perf_counter()
-        return end - start
-
-
-def run_hf(
-    requests: list[SampleRequest],
-    model: str,
-    tokenizer: PreTrainedTokenizerBase,
-    n: int,
-    max_batch_size: int,
-    trust_remote_code: bool,
-    disable_detokenize: bool = False,
-) -> float:
-    llm = AutoModelForCausalLM.from_pretrained(
-        model, torch_dtype=torch.float16, trust_remote_code=trust_remote_code
-    )
-    if llm.config.model_type == "llama":
-        # To enable padding in the HF backend.
-        tokenizer.pad_token = tokenizer.eos_token
-    llm = llm.cuda()
-
-    pbar = tqdm(total=len(requests))
-    start = time.perf_counter()
-    batch: list[str] = []
-    max_prompt_len = 0
-    max_output_len = 0
-    for i in range(len(requests)):
-        prompt = requests[i].prompt
-        prompt_len = requests[i].prompt_len
-        output_len = requests[i].expected_output_len
-        # Add the prompt to the batch.
-        batch.append(prompt)
-        max_prompt_len = max(max_prompt_len, prompt_len)
-        max_output_len = max(max_output_len, output_len)
-        if len(batch) < max_batch_size and i != len(requests) - 1:
-            # Check if we can add more requests to the batch.
-            next_prompt_len = requests[i + 1].prompt_len
-            next_output_len = requests[i + 1].expected_output_len
-            if (
-                max(max_prompt_len, next_prompt_len)
-                + max(max_output_len, next_output_len)
-            ) <= 2048:
-                # We can add more requests to the batch.
-                continue
-
-        # Generate the sequences.
-        input_ids = tokenizer(batch, return_tensors="pt", padding=True).input_ids
-        llm_outputs = llm.generate(
-            input_ids=input_ids.cuda(),
-            do_sample=True,
-            num_return_sequences=n,
-            temperature=1.0,
-            top_p=1.0,
-            use_cache=True,
-            max_new_tokens=max_output_len,
-        )
-        if not disable_detokenize:
-            # Include the decoding time.
-            tokenizer.batch_decode(llm_outputs, skip_special_tokens=True)
-        pbar.update(len(batch))
-
-        # Clear the batch.
-        batch = []
-        max_prompt_len = 0
-        max_output_len = 0
-    end = time.perf_counter()
-    return end - start
-
-
-def run_mii(
-    requests: list[SampleRequest],
-    model: str,
-    tensor_parallel_size: int,
-    output_len: int,
-) -> float:
-    from mii import client, serve
-
-    llm = serve(model, tensor_parallel=tensor_parallel_size)
-    prompts = [request.prompt for request in requests]
-
-    start = time.perf_counter()
-    llm.generate(prompts, max_new_tokens=output_len)
-    end = time.perf_counter()
-    client = client(model)
-    client.terminate_server()
-    return end - start
-
 
 def save_to_pytorch_benchmark_format(
     args: argparse.Namespace, results: dict[str, Any]
@@ -393,41 +203,11 @@ def main(args: argparse.Namespace):
     is_multi_modal = any(request.multi_modal_data is not None for request in requests)
     request_outputs: Optional[list[RequestOutput]] = None
     if args.backend == "vllm":
-        if args.async_engine:
-            elapsed_time = uvloop.run(
-                run_vllm_async(
-                    requests,
-                    args.n,
-                    AsyncEngineArgs.from_cli_args(args),
-                    args.disable_frontend_multiprocessing,
-                    args.disable_detokenize,
-                )
-            )
-        else:
-            elapsed_time, request_outputs = run_vllm(
-                requests,
-                args.n,
-                EngineArgs.from_cli_args(args),
-                args.disable_detokenize,
-            )
-    elif args.backend == "hf":
-        assert args.tensor_parallel_size == 1
-        elapsed_time = run_hf(
+        elapsed_time, request_outputs = run_vllm(
             requests,
-            args.model,
-            tokenizer,
             args.n,
-            args.hf_max_batch_size,
-            args.trust_remote_code,
+            EngineArgs.from_cli_args(args),
             args.disable_detokenize,
-        )
-    elif args.backend == "mii":
-        elapsed_time = run_mii(
-            requests, args.model, args.tensor_parallel_size, args.output_len
-        )
-    elif args.backend == "vllm-chat":
-        elapsed_time, request_outputs = run_vllm_chat(
-            requests, args.n, EngineArgs.from_cli_args(args), args.disable_detokenize
         )
     else:
         raise ValueError(f"Unknown backend: {args.backend}")
@@ -523,7 +303,7 @@ def validate_args(args):
         args.tokenizer = args.model
 
     # === Backend Validation ===
-    valid_backends = {"vllm", "hf", "mii", "vllm-chat"}
+    valid_backends = {"vllm"}
     if args.backend not in valid_backends:
         raise ValueError(f"Unsupported backend: {args.backend}")
 
@@ -623,7 +403,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--backend",
         type=str,
-        choices=["vllm", "hf", "mii", "vllm-chat"],
+        choices=["vllm"],
         default="vllm",
     )
     parser.add_argument(
@@ -675,18 +455,6 @@ if __name__ == "__main__":
         type=str,
         default=None,
         help="Path to save the throughput results in JSON format.",
-    )
-    parser.add_argument(
-        "--async-engine",
-        action="store_true",
-        default=False,
-        help="Use vLLM async engine rather than LLM class.",
-    )
-    parser.add_argument(
-        "--disable-frontend-multiprocessing",
-        action="store_true",
-        default=False,
-        help="Disable decoupled async engine frontend.",
     )
     parser.add_argument(
         "--disable-detokenize",

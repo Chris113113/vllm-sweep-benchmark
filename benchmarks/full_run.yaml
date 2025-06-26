@@ -18,7 +18,7 @@ standalone_runs:
       - { input_len: 4096, output_len: 4096 }
     args: >
       --model "meta-llama/Llama-3.3-70B-Instruct"
-      --num-prompts 200
+      --num-prompts 3500
       --gpu-memory-utilization 0.9
       --quantization fp8
 

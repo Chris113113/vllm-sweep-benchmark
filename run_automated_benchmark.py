@@ -10,12 +10,13 @@ import shlex
 import json
 import argparse
 import re
+import io
 from datetime import datetime
 
 # --- Configuration ---
 SERVER_STARTUP_TIMEOUT = 300
 SERVER_HEALTH_CHECK_URL = "http://localhost:8000/v1/models"
-VLLM_BENCHMARK_SCRIPT_PATH = "vllm-repo-benchmark/benchmarks/benchmark_throughput.py"
+VLLM_BENCHMARK_SCRIPT_PATH = "vllm-repo-benchmark/benchmarks/benchmark_vllm_throughput.py"
 FATAL_ERROR_STRINGS = ["EngineCore failed to start."]
 RETRYABLE_ERROR_STRINGS = ["uncorrectable NVLink error"]
 # Increase the cleanup timeout to give the OS more time to reap zombie processes
@@ -48,33 +49,55 @@ def wait_for_server(timeout):
 
 def stream_and_capture_output(pipe, prefix, captured_lines_list, fatal_error_event=None, fatal_error_strings=None, retryable_error_event=None, retryable_error_strings=None):
     """
-    Reads a subprocess's output stream, prints it live, captures it,
-    and sets an event if a fatal or retryable error string is detected.
+    Reads a subprocess's output stream, buffering until a newline or carriage return.
+    This allows progress bars (which use \r) to update in place, while still capturing
+    and prefixing full lines of output for logging.
     """
     try:
-        for line in iter(pipe.readline, b''):
-            decoded_line = line.decode()
-            timestamp = datetime.now().strftime('%H:%M:%S.%f')[:-3]
-            print(f"[{timestamp}] [{prefix}]: {decoded_line.strip()}", flush=True)
-            captured_lines_list.append(decoded_line)
-            
-            if fatal_error_event and fatal_error_strings:
-                for error_string in fatal_error_strings:
-                    if error_string in decoded_line:
-                        print(f"[{timestamp}] [FATAL_ERROR]: Detected fatal error string '{error_string}'. Signaling termination.")
-                        fatal_error_event.set()
-                        break
-            
-            if retryable_error_event and retryable_error_strings:
-                for error_string in retryable_error_strings:
-                    if error_string in decoded_line:
-                        print(f"[{timestamp}] [RETRYABLE_ERROR]: Detected retryable error string '{error_string}'. Signaling termination for retry.")
-                        retryable_error_event.set()
-                        break
-    finally:
-        pipe.close()
+        # Use a wrapper to treat the binary pipe as a text stream.
+        with io.TextIOWrapper(pipe, encoding='utf-8', errors='replace') as text_stream:
+            buffer = ""
+            for char in iter(lambda: text_stream.read(1), ''):
+                if not char:
+                    break  # End of stream
+                
+                buffer += char
+                
+                # Process the buffer when a line-ending character is found.
+                # This handles both normal log lines (\n) and updating lines like progress bars (\r).
+                if char == '\n' or char == '\r':
+                    timestamp = datetime.now().strftime('%H:%M:%S.%f')[:-3]
+                    
+                    # Write the prefix and the buffered content. The buffer already contains the
+                    # correct line ending (\n or \r), so we write it directly.
+                    sys.stdout.write(f"[{timestamp}] [{prefix}]: {buffer}")
+                    sys.stdout.flush()
 
-def execute_and_monitor_process(command, log_prefix, output_dir, log_filename_base, fatal_error_strings=None, retryable_error_strings=None):
+                    captured_lines_list.append(buffer)
+                    
+                    # Check for error strings in the completed line.
+                    if fatal_error_event and fatal_error_strings:
+                        if any(e in buffer for e in fatal_error_strings):
+                            fatal_error_event.set()
+                    if retryable_error_event and retryable_error_strings:
+                        if any(e in buffer for e in retryable_error_strings):
+                            retryable_error_event.set()
+                    
+                    # Reset buffer after processing the line.
+                    buffer = ""
+
+            # Handle any remaining text in the buffer that doesn't end with a newline.
+            if buffer:
+                timestamp = datetime.now().strftime('%H:%M:%S.%f')[:-3]
+                sys.stdout.write(f"[{timestamp}] [{prefix}]: {buffer}\n") # Add a final newline for clarity
+                sys.stdout.flush()
+                captured_lines_list.append(buffer)
+
+    except Exception as e:
+        timestamp = datetime.now().strftime('%H:%M:%S.%f')[:-3]
+        print(f"[{timestamp}] [STREAM_ERROR]: An error occurred in the stream reader: {e}", flush=True)
+
+def execute_and_monitor_process(command, job_name, log_prefix, output_dir, log_filename_base, fatal_error_strings=None, retryable_error_strings=None):
     """
     A helper function to execute a subprocess, stream its logs,
     monitor for errors, and terminate early if needed.
@@ -87,14 +110,18 @@ def execute_and_monitor_process(command, log_prefix, output_dir, log_filename_ba
     
     stdout_lines, stderr_lines = [], []
     
+    # Combine job name and log prefix for a more descriptive log output
+    stdout_prefix = f"{job_name}:{log_prefix}_STDOUT"
+    stderr_prefix = f"{job_name}:{log_prefix}_STDERR"
+    
     stream_args = (
-        process.stdout, f"{log_prefix}_STDOUT", stdout_lines,
+        process.stdout, stdout_prefix, stdout_lines,
         fatal_error_event, fatal_error_strings,
         retryable_error_event, retryable_error_strings
     )
     
     stdout_thread = threading.Thread(target=stream_and_capture_output, args=stream_args, daemon=True)
-    stderr_thread = threading.Thread(target=stream_and_capture_output, args=(process.stderr, f"{log_prefix}_STDERR", stderr_lines, fatal_error_event, fatal_error_strings, retryable_error_event, retryable_error_strings), daemon=True)
+    stderr_thread = threading.Thread(target=stream_and_capture_output, args=(process.stderr, stderr_prefix, stderr_lines, fatal_error_event, fatal_error_strings, retryable_error_event, retryable_error_strings), daemon=True)
     
     stdout_thread.start()
     stderr_thread.start()
@@ -149,7 +176,7 @@ def run_client_benchmark(client_config, run_index, output_dir):
     log_filename = f"{run_index}_{sanitize_filename(run_name)}_client.log"
     
     client_stdout, exec_status = execute_and_monitor_process(
-        command, "CLIENT", output_dir, log_filename, 
+        command, run_name, "CLIENT", output_dir, log_filename, 
         fatal_error_strings=FATAL_ERROR_STRINGS,
         retryable_error_strings=RETRYABLE_ERROR_STRINGS
     )
@@ -169,7 +196,7 @@ def run_client_benchmark(client_config, run_index, output_dir):
             return {"run_name": run_name, "status": "CLIENT_JSON_ERROR"}
     return {"run_name": run_name, "status": "CLIENT_NO_OUTPUT"}
 
-def run_vllm_throughput_benchmark(run_config, run_index, output_dir, ):
+def run_vllm_throughput_benchmark(run_config, run_index, output_dir):
     run_name = run_config.get('name', f'vLLM_Official_Run_{run_index}')
     args_list = shlex.split(run_config.get('args', ''))
     
@@ -180,7 +207,7 @@ def run_vllm_throughput_benchmark(run_config, run_index, output_dir, ):
     log_filename = f"{run_index}_{sanitize_filename(run_name)}_vllm_script.log"
 
     full_output, exec_status = execute_and_monitor_process(
-        command, "VLLM_BENCH", output_dir, log_filename, 
+        command, run_name, "VLLM_BENCH", output_dir, log_filename, 
         fatal_error_strings=FATAL_ERROR_STRINGS,
         retryable_error_strings=RETRYABLE_ERROR_STRINGS
     )
@@ -198,6 +225,20 @@ def run_vllm_throughput_benchmark(run_config, run_index, output_dir, ):
         results["throughput_total_tokens_per_sec"] = float(throughput_match.group(2))
         results["throughput_output_tokens_per_sec"] = float(throughput_match.group(3))
         status = "SUCCESS"
+
+    # Parse new metrics
+    ttft_avg_match = re.search(r"Average TTFT \(s\): ([\d.]+)", full_output)
+    if ttft_avg_match:
+        results["avg_ttft_s"] = float(ttft_avg_match.group(1))
+    ttft_p99_match = re.search(r"P99 TTFT \(s\): ([\d.]+)", full_output)
+    if ttft_p99_match:
+        results["p99_ttft_s"] = float(ttft_p99_match.group(1))
+    tpot_avg_match = re.search(r"Average TPOT \(tokens/s\): ([\d.]+)", full_output)
+    if tpot_avg_match:
+        results["avg_tpot_tokens_per_s"] = float(tpot_avg_match.group(1))
+    tpot_p99_match = re.search(r"P99 TPOT \(tokens/s\): ([\d.]+)", full_output)
+    if tpot_p99_match:
+        results["p99_tpot_tokens_per_s"] = float(tpot_p99_match.group(1))
 
     for line in full_output.splitlines():
         if "Total num prompt tokens:" in line: results["total_prompt_tokens"] = int(line.split(":")[1].strip())

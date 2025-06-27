@@ -48,13 +48,15 @@ def run_vllm(
     from vllm import LLM, SamplingParams
 
     llm = LLM(**dataclasses.asdict(engine_args))
+    max_request_len = max(req.prompt_len + req.expected_output_len for req in requests)
     assert all(
         llm.llm_engine.model_config.max_model_len
         >= (request.prompt_len + request.expected_output_len)
         for request in requests
     ), (
-        "Please ensure that max_model_len is greater than the sum of"
+        "Please ensure that max_model_len " + str(llm.llm_engine.model_config.max_model_len) +" is greater than the sum of"
         " prompt_len and expected_output_len for all requests."
+        " A request was found of requested length " + str(max_request_len)
     )
     # Add the requests to the engine.
     prompts: list[Union[TextPrompt, TokensPrompt]] = []

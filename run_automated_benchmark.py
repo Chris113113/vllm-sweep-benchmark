@@ -17,6 +17,9 @@ import concurrent.futures
 import queue
 import concurrent.futures
 
+# --- Thread-safe lock for summary file ---
+summary_file_lock = threading.Lock()
+
 # --- Configuration ---
 SERVER_STARTUP_TIMEOUT = 300
 SERVER_HEALTH_CHECK_URL = "http://localhost:8000/v1/models"
@@ -154,7 +157,7 @@ def stream_and_capture_output(pipe, prefix, captured_lines_list, fatal_error_eve
         timestamp = datetime.now().strftime('%H:%M:%S.%f')[:-3]
         print(f"[{timestamp}] [STREAM_ERROR]: An error occurred in the stream reader: {e}", flush=True)
 
-def execute_and_monitor_process(command, job_name, log_prefix, output_dir, log_filename_base, gpu_ids=None, fatal_error_strings=None, retryable_error_strings=None):
+def execute_and_monitor_process(command, job_name, log_prefix, logs_dir, log_filename_base, gpu_ids=None, fatal_error_strings=None, retryable_error_strings=None):
     """
     A helper function to execute a subprocess on a specific set of GPUs, stream its logs,
     monitor for errors, and terminate early if needed.
@@ -208,7 +211,7 @@ def execute_and_monitor_process(command, job_name, log_prefix, output_dir, log_f
     stdout_thread.join(timeout=PROCESS_CLEANUP_TIMEOUT)
     stderr_thread.join(timeout=PROCESS_CLEANUP_TIMEOUT)
 
-    log_filepath = os.path.join(output_dir, log_filename_base)
+    log_filepath = os.path.join(logs_dir, log_filename_base)
     with open(log_filepath, 'w') as f:
         f.write("--- STDOUT ---\n")
         f.write("".join(stdout_lines))
@@ -227,7 +230,7 @@ def execute_and_monitor_process(command, job_name, log_prefix, output_dir, log_f
 
 
 # --- Benchmark Execution Functions ---
-def run_client_benchmark(client_config, run_index, output_dir):
+def run_client_benchmark(client_config, run_index, logs_dir):
     run_name = client_config.get('name', f'Unnamed_Client_Run_{run_index}')
     client_args = shlex.split(client_config.get('client_args', ''))
     
@@ -238,7 +241,7 @@ def run_client_benchmark(client_config, run_index, output_dir):
     log_filename = f"{run_index}_{sanitize_filename(run_name)}_client.log"
     
     client_stdout, exec_status = execute_and_monitor_process(
-        command, run_name, "CLIENT", output_dir, log_filename, 
+        command, run_name, "CLIENT", logs_dir, log_filename, 
         fatal_error_strings=FATAL_ERROR_STRINGS,
         retryable_error_strings=RETRYABLE_ERROR_STRINGS
     )
@@ -258,7 +261,7 @@ def run_client_benchmark(client_config, run_index, output_dir):
             return {"run_name": run_name, "status": "CLIENT_JSON_ERROR"}
     return {"run_name": run_name, "status": "CLIENT_NO_OUTPUT"}
 
-def run_vllm_throughput_benchmark(run_config, run_index, output_dir, gpu_ids=None):
+def run_vllm_throughput_benchmark(run_config, run_index, logs_dir, gpu_ids=None):
     run_name = run_config.get('name', f'vLLM_Official_Run_{run_index}')
     args_list = shlex.split(run_config.get('args', ''))
     
@@ -269,7 +272,7 @@ def run_vllm_throughput_benchmark(run_config, run_index, output_dir, gpu_ids=Non
     log_filename = f"{run_index}_{sanitize_filename(run_name)}_vllm_script.log"
 
     full_output, exec_status = execute_and_monitor_process(
-        command, run_name, "VLLM_BENCH", output_dir, log_filename, 
+        command, run_name, "VLLM_BENCH", logs_dir, log_filename, 
         gpu_ids=gpu_ids,
         fatal_error_strings=FATAL_ERROR_STRINGS,
         retryable_error_strings=RETRYABLE_ERROR_STRINGS
@@ -281,7 +284,7 @@ def run_vllm_throughput_benchmark(run_config, run_index, output_dir, gpu_ids=Non
         return {"run_name": run_name, "status": "RETRYABLE_ERROR"}
 
     results = {}
-    status = "COMPLETED"
+    status = "FAILED"
     throughput_match = re.search(r"Throughput: ([\d.]+) requests/s, ([\d.]+) total tokens/s, ([\d.]+) output tokens/s", full_output)
     if throughput_match:
         results["throughput_req_per_sec"] = float(throughput_match.group(1))
@@ -315,19 +318,35 @@ def run_vllm_throughput_benchmark(run_config, run_index, output_dir, gpu_ids=Non
     }
 
 
-def update_summary_file(filepath, new_result):
-    """Reads the summary JSON, updates the entry for the given run, and writes it back."""
-    try:
-        with open(filepath, 'r') as f: all_results = json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError): all_results = []
-    
-    run_name_to_update = new_result.get('run_name')
-    found = False
-    for i, result in enumerate(all_results):
-        if result.get('run_name') == run_name_to_update:
-            all_results[i] = new_result; found = True; break
-    if not found: all_results.append(new_result)
-    with open(filepath, 'w') as f: json.dump(all_results, f, indent=4)
+def update_summary_file(filepath, new_result, status=None):
+    """
+    Reads the summary JSON, updates the entry for the given run, and writes it back.
+    This function is now thread-safe.
+    """
+    with summary_file_lock:
+        try:
+            with open(filepath, 'r') as f:
+                all_results = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            all_results = []
+
+        run_name_to_update = new_result.get('run_name')
+        found = False
+        for i, result in enumerate(all_results):
+            if result.get('run_name') == run_name_to_update:
+                if status:
+                    all_results[i]['status'] = status
+                else:
+                    # Merge new result with existing data, preserving original fields
+                    all_results[i] = {**result, **new_result}
+                found = True
+                break
+        
+        if not found and not status:
+            all_results.append(new_result)
+
+        with open(filepath, 'w') as f:
+            json.dump(all_results, f, indent=4)
 
 def print_run_plan(jobs):
     """Prints a formatted table of the benchmark execution plan."""
@@ -368,22 +387,26 @@ def print_run_plan(jobs):
 
     print("#"*80)
 
-def run_job_wrapper(job, run_index, gpu_manager, args):
-
+def run_job_wrapper(job, run_index, gpu_manager, args, logs_dir):
     """
     A wrapper function that acquires GPUs, runs a benchmark job,
     and ensures the GPUs are released.
     """
     tp_size = job['config'].get('tensor_parallel_size', 1)
-    
+    run_name = job['config'].get('name')
+    report_filepath = os.path.join(args.output_dir, "summary_report.json")
+
     gpu_ids = None
     while gpu_ids is None:
         gpu_ids = gpu_manager.acquire(tp_size)
         if gpu_ids is None:
-            time.sleep(1) # Wait for GPUs to become available
+            time.sleep(1)  # Wait for GPUs to become available
+
+    # Mark the job as RUNNING now that it has acquired GPUs
+    update_summary_file(report_filepath, {"run_name": run_name}, status="RUNNING")
 
     try:
-        result = run_vllm_throughput_benchmark(job['config'], run_index, args.output_dir, gpu_ids=gpu_ids)
+        result = run_vllm_throughput_benchmark(job['config'], run_index, logs_dir, gpu_ids=gpu_ids)
         return result
     finally:
         gpu_manager.release(gpu_ids)
@@ -398,8 +421,27 @@ def main():
     args = parser.parse_args()
 
     os.makedirs(args.output_dir, exist_ok=True)
+    logs_dir = os.path.join(args.output_dir, f"client_logs_{datetime.now().strftime('%Y%m%d_%H%M%S')}")
+    os.makedirs(logs_dir, exist_ok=True)
     print(f"Results will be saved to directory: '{args.output_dir}'")
+    print(f"Logs will be saved to directory: '{logs_dir}'")
     with open(args.config_file, 'r') as f: config = yaml.safe_load(f)
+
+    # --- Load existing summary to support resuming ---
+    report_filepath = os.path.join(args.output_dir, "summary_report.json")
+    existing_results = []
+    completed_runs = set()
+    if os.path.exists(report_filepath):
+        try:
+            with open(report_filepath, 'r') as f:
+                existing_results = json.load(f)
+            for result in existing_results:
+                if result.get('status') == 'SUCCESS':
+                    completed_runs.add(result.get('run_name'))
+            print(f"Found existing summary report. Will skip {len(completed_runs)} completed runs.")
+        except (json.JSONDecodeError, IOError) as e:
+            print(f"[WARNING] Could not read existing summary report: {e}. Starting fresh.")
+            existing_results = []
 
     # --- Job Planning ---
     server_jobs = [
@@ -408,14 +450,14 @@ def main():
         if 'server_config' in config
     ]
     
-    standalone_jobs = []
+    all_planned_jobs = []
     for run_config in config.get('standalone_runs', []):
         if run_config.get('mode') != 'vllm_throughput':
             continue
         
         base_name = run_config.get('name', 'Standalone_Run')
         base_args_str = run_config.get('args', '')
-        tp_sizes = run_config.get('tensor_parallel_sizes', [1]) # Default to 1 if not specified
+        tp_sizes = run_config.get('tensor_parallel_sizes', [1])
         length_configs = run_config.get('length_configs', [{}])
 
         for length_conf in length_configs:
@@ -425,16 +467,28 @@ def main():
                 
                 input_len = length_conf.get('input_len')
                 output_len = length_conf.get('output_len')
+                prefix_len = length_conf.get('prefix_len')
 
-                if input_len is not None and output_len is not None:
-                    max_len = input_len + output_len
-                    name_parts.append(f"ISL-{input_len}_OSL-{output_len}")
-                    args_parts.append(f"--input-len {input_len} --output-len {output_len} --max-model-len {max_len}")
+                # Append length-related arguments and build name
+                if input_len is not None:
+                    name_parts.append(f"ISL-{input_len}")
+                    args_parts.append(f"--input-len {input_len}")
+                if output_len is not None:
+                    name_parts.append(f"OSL-{output_len}")
+                    args_parts.append(f"--output-len {output_len}")
+                if prefix_len is not None:
+                    name_parts.append(f"PL-{prefix_len}")
+                    args_parts.append(f"--prefix-len {prefix_len}")
+
+                # Calculate and append max_model_len if not manually specified
+                if input_len is not None and output_len is not None and "--max-model-len" not in base_args_str:
+                    max_len = input_len + output_len + (prefix_len or 0) + 1
+                    args_parts.append(f"--max-model-len {max_len}")
 
                 final_name = "_".join(name_parts)
                 final_args = " ".join(filter(None, args_parts))
                 
-                standalone_jobs.append({
+                all_planned_jobs.append({
                     'type': 'standalone',
                     'config': {
                         'name': final_name,
@@ -444,23 +498,34 @@ def main():
                     }
                 })
 
+    # --- Initialize Summary Report ---
+    # Create a map of existing results for easy lookup
+    results_map = {res.get('run_name'): res for res in existing_results}
+    # Add all planned jobs to the map, preserving existing results
+    for job in all_planned_jobs:
+        run_name = job['config'].get('name')
+        if run_name not in results_map:
+            results_map[run_name] = {"run_name": run_name, "status": "NOT_STARTED"}
+    
+    # Convert map back to a list for saving
+    final_summary_list = list(results_map.values())
+    with open(report_filepath, 'w') as f:
+        json.dump(final_summary_list, f, indent=4)
+    print(f"✅ Summary report updated at '{report_filepath}' with {len(all_planned_jobs)} total runs.")
+
+    # --- Filter out completed jobs ---
+    standalone_jobs = [job for job in all_planned_jobs if job['config']['name'] not in completed_runs]
+    
     # Sort standalone jobs by tensor parallel size (ascending)
     standalone_jobs.sort(key=lambda j: j['config'].get('tensor_parallel_size', 1))
     
-    all_jobs = standalone_jobs + server_jobs
-    if not all_jobs:
-        print("No valid benchmark runs found in config file.")
+    all_jobs_to_run = standalone_jobs + server_jobs
+    if not all_jobs_to_run:
+        print("No new benchmark runs to execute.")
         return
 
     # --- Print Run Plan ---
-    print_run_plan(all_jobs)
-
-    # --- Initialize Summary Report ---
-    report_filepath = os.path.join(args.output_dir, "summary_report.json")
-    initial_results = [{"run_name": job['config'].get('name'), "status": "NOT_STARTED"} for job in all_jobs]
-    with open(report_filepath, 'w') as f:
-        json.dump(initial_results, f, indent=4)
-    print(f"✅ Initial summary report created at '{report_filepath}' with {len(initial_results)} planned runs.")
+    print_run_plan(all_jobs_to_run)
 
     # --- Execute Standalone Jobs in Parallel ---
     num_gpus = get_gpu_count()
@@ -474,7 +539,7 @@ def main():
         with concurrent.futures.ThreadPoolExecutor(max_workers=num_gpus) as executor:
             # Map each job to the wrapper function
             future_to_job = {
-                executor.submit(run_job_wrapper, job, i + 1, gpu_manager, args): job
+                executor.submit(run_job_wrapper, job, i + 1, gpu_manager, args, logs_dir): job
                 for i, job in enumerate(standalone_jobs)
             }
             
@@ -508,7 +573,12 @@ def main():
                 # Run all client benchmarks against the single server
                 for i, job in enumerate(server_jobs):
                     run_counter = len(standalone_jobs) + i + 1
-                    result = run_client_benchmark(job['config'], run_counter, args.output_dir)
+                    
+                    # Mark the job as RUNNING before execution
+                    report_filepath = os.path.join(args.output_dir, "summary_report.json")
+                    update_summary_file(report_filepath, {"run_name": job['config'].get('name')}, status="RUNNING")
+                    
+                    result = run_client_benchmark(job['config'], run_counter, logs_dir)
                     if result:
                         update_summary_file(report_filepath, result)
         finally:

@@ -13,6 +13,51 @@ def sanitize_filename(name):
     s = s.replace(" ", "_")
     return s
 
+def save_to_csv(df, output_path, model_name):
+    """
+    Saves the benchmark results to a CSV file with a specific schema.
+    """
+    if df.empty:
+        return
+
+    # Create a new DataFrame with the desired schema
+    csv_df = pd.DataFrame()
+
+    # Map the data from the input DataFrame to the new schema
+    csv_df['run_id'] = df['run_name']
+    csv_df['model_id'] = df['model']
+    csv_df['inference_software_id'] = 'vllm'  # Assuming vLLM is the inference software
+    csv_df['hardware_id'] = 'a4'  # Placeholder for hardware ID
+    csv_df['workload_type'] = 'offline_benchmark'
+    csv_df['workload_checkpoint_path'] = ''  # Placeholder
+    csv_df['workload_tokenizer_name_or_path'] = df['model']
+    csv_df['workload_max_output_length'] = df['output-len']
+    csv_df['workload_max_input_length'] = df['input-len']
+    csv_df['workload_precision_config'] = df.get('quantization', '') 
+    csv_df['hardware_total_chips_used'] = pd.to_numeric(df['tp_size'], errors='coerce').fillna(0).astype(int)
+    csv_df['result_success'] = df['status'] == 'SUCCESS'
+    csv_df['result_error_message'] = ''  # Placeholder
+    csv_df['metrics_output_tokens_per_sec'] = df.get('throughput_output_tokens_per_sec')
+    csv_df['metrics_e2e_latency_p90_ms'] = ''  # Placeholder, as this metric is not in the source data
+    csv_df['metrics_ttft_avg_ms'] = df.get('avg_ttft_s', 0) * 1000
+    csv_df['metrics_tpot_avg_ms'] = df.get('avg_tpot_tokens_per_s')
+    
+    # Add prefix length to comments if it exists and is not 0
+    if 'prefix-len' in df.columns:
+        csv_df['logs_comments_string'] = df['prefix-len'].apply(
+            lambda x: f"Prefix length: {x}" if pd.notna(x) and x != 0 else ''
+        )
+    else:
+        csv_df['logs_comments_string'] = ''
+
+    csv_df['run_type'] = 'benchmark'
+    csv_df['update_person_ldap'] = 'pirillo'  # Placeholder
+    csv_df['uploaded_to_bq'] = ''  # Placeholder
+
+    csv_filepath = os.path.join(output_path, f'{sanitize_filename(model_name)}_benchmark_results.csv')
+    csv_df.to_csv(csv_filepath, index=False)
+    print(f"CSV results saved to: {csv_filepath}")
+
 def plot_latency_metrics(df, output_path, model_name):
     """
     Generates and saves dot plots for latency percentiles (TTFT, ITL).
@@ -99,7 +144,7 @@ def plot_throughput_metrics(df, output_path, model_name):
         )
 
     ax.set_title(f'Throughput for {model_name}\n(Tokens/Second vs. Sequence Length by Tensor Parallel Size)', fontsize=20, pad=20)
-    ax.set_xlabel('Sequence Length (Input / Output Tokens)', fontsize=14)
+    ax.set_xlabel('Sequence Length (Input / Output / Prefix Tokens)', fontsize=14)
     ax.set_ylabel('Throughput (Generated Tokens / Second)', fontsize=14)
     ax.tick_params(axis='x', rotation=45, labelsize=12)
     ax.tick_params(axis='y', labelsize=12)
@@ -145,9 +190,13 @@ def main():
 
             input_len = flat_run.get('input-len', flat_run.get('max_input_length'))
             output_len = flat_run.get('output-len', flat_run.get('max_output_length'))
-            
+            prefix_len = flat_run.get('prefix-len')
+
             if input_len is not None and output_len is not None:
-                flat_run['seq_len_label'] = f"{input_len} / {output_len}"
+                label = f"{input_len} / {output_len}"
+                if prefix_len is not None:
+                    label += f" / {prefix_len}"
+                flat_run['seq_len_label'] = label
             else:
                 flat_run['seq_len_label'] = 'N/A'
 
@@ -168,9 +217,12 @@ def main():
     if successful_runs_df.empty:
         print("No successful benchmark runs to visualize."); return
 
+    # --- Generate a single CSV for all successful runs ---
+    save_to_csv(successful_runs_df, output_path, "benchmark_summary")
+
     model_col = 'model' if 'model' in successful_runs_df.columns else 'run_name'
     for model_identifier, group_df in successful_runs_df.groupby(model_col):
-        print(f"\n--- Generating plots for group: {model_identifier} ---")
+        print(f"--- Generating plots for group: {model_identifier} ---")
         
         # --- FIX: Use 'output_path' consistently ---
         model_output_path = os.path.join(output_path, sanitize_filename(model_identifier))

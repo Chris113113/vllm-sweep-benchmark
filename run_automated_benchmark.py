@@ -21,8 +21,6 @@ import concurrent.futures
 summary_file_lock = threading.Lock()
 
 # --- Configuration ---
-SERVER_STARTUP_TIMEOUT = 300
-SERVER_HEALTH_CHECK_URL = "http://localhost:8000/v1/models"
 VLLM_BENCHMARK_SCRIPT_PATH = "vllm-repo-benchmark/benchmarks/benchmark_vllm_throughput.py"
 FATAL_ERROR_STRINGS = ["EngineCore failed to start."]
 RETRYABLE_ERROR_STRINGS = ["uncorrectable NVLink error"]
@@ -50,25 +48,6 @@ def sanitize_filename(name):
     s = s.replace(" ", "_")
     return s
 
-def is_server_ready():
-    try:
-        response = requests.get(SERVER_HEALTH_CHECK_URL, timeout=1)
-        return response.status_code == 200
-    except requests.exceptions.RequestException:
-        return False
-
-def wait_for_server(timeout):
-    start_time = time.monotonic()
-    print(f"[{datetime.now().strftime('%H:%M:%S.%f')[:-3]}] Waiting for server to become ready...", end="")
-    while time.monotonic() - start_time < timeout:
-        if is_server_ready():
-            print(f"\n[{datetime.now().strftime('%H:%M:%S.%f')[:-3]}] Server is ready.")
-            return True
-        print(".", end="", flush=True)
-        time.sleep(1)
-    print(f"\n[{datetime.now().strftime('%H:%M:%S.%f')[:-3]}] Error: Server did not become ready in time.")
-    return False
-
 # --- GPU Resource Management ---
 class GPUManager:
     """A thread-safe manager to allocate and release GPUs."""
@@ -79,14 +58,15 @@ class GPUManager:
         self.lock = threading.Lock()
 
     def acquire(self, count):
-        """Acquires a contiguous block of 'count' GPUs."""
+        """Acquires 'count' available GPUs, not necessarily contiguous."""
         with self.lock:
-            for i in range(self.num_gpus - count + 1):
-                if all(self.available[i:i+count]):
-                    self.available[i:i+count] = [False] * count
-                    gpu_ids = list(range(i, i + count))
-                    print(f"[{datetime.now().strftime('%H:%M:%S.%f')[:-3]}] [GPUManager]: Acquired GPUs {gpu_ids}")
-                    return gpu_ids
+            available_gpus = [i for i, is_free in enumerate(self.available) if is_free]
+            if len(available_gpus) >= count:
+                gpu_ids_to_acquire = available_gpus[:count]
+                for gpu_id in gpu_ids_to_acquire:
+                    self.available[gpu_id] = False
+                print(f"[{datetime.now().strftime('%H:%M:%S.%f')[:-3]}] [GPUManager]: Acquired GPUs {gpu_ids_to_acquire}")
+                return gpu_ids_to_acquire
             return None
 
     def release(self, gpu_ids):
@@ -230,37 +210,6 @@ def execute_and_monitor_process(command, job_name, log_prefix, logs_dir, log_fil
 
 
 # --- Benchmark Execution Functions ---
-def run_client_benchmark(client_config, run_index, logs_dir):
-    run_name = client_config.get('name', f'Unnamed_Client_Run_{run_index}')
-    client_args = shlex.split(client_config.get('client_args', ''))
-    
-    print("\n" + "-"*80)
-    print(f"🏁 ({run_index}) Running Client Benchmark: '{run_name}'")
-    
-    command = ['python', 'run_benchmark_client.py'] + client_args
-    log_filename = f"{run_index}_{sanitize_filename(run_name)}_client.log"
-    
-    client_stdout, exec_status = execute_and_monitor_process(
-        command, run_name, "CLIENT", logs_dir, log_filename, 
-        fatal_error_strings=FATAL_ERROR_STRINGS,
-        retryable_error_strings=RETRYABLE_ERROR_STRINGS
-    )
-
-    if exec_status == "fatal_error":
-        return {"run_name": run_name, "status": "TERMINATED_DUE_TO_FATAL_ERROR"}
-    if exec_status == "retryable_error":
-        return {"run_name": run_name, "status": "RETRYABLE_ERROR"}
-    
-    if client_stdout:
-        try:
-            result = json.loads(client_stdout)
-            result['run_name'] = run_name
-            result['client_log_file'] = log_filename
-            return result
-        except json.JSONDecodeError:
-            return {"run_name": run_name, "status": "CLIENT_JSON_ERROR"}
-    return {"run_name": run_name, "status": "CLIENT_NO_OUTPUT"}
-
 def run_vllm_throughput_benchmark(run_config, run_index, logs_dir, gpu_ids=None):
     run_name = run_config.get('name', f'vLLM_Official_Run_{run_index}')
     args_list = shlex.split(run_config.get('args', ''))
@@ -376,9 +325,6 @@ def print_run_plan(jobs):
         if job_type == 'standalone':
             tp_size = config.get('tensor_parallel_size', 1)
             details = config.get('args', '')
-        elif job_type == 'custom':
-            tp_size = '-'
-            details = config.get('client_args', '')
         else:
             tp_size = '-'
             details = ''
@@ -418,6 +364,7 @@ def main():
     parser.add_argument("--output-dir", help="Directory to save the final results and logs.", default=f"benchmark_results_{int(time.time())}")
     parser.add_argument("--max-retries", type=int, default=1, help="Maximum number of retries for a job that fails with a retryable error.")
     parser.add_argument("--retry-delay", type=int, default=10, help="Seconds to wait before retrying a failed job.")
+    parser.add_argument("--prompt-for-confirmation", action="store_true", help="If set, prompt for confirmation before running the benchmark.")
     args = parser.parse_args()
 
     os.makedirs(args.output_dir, exist_ok=True)
@@ -444,12 +391,6 @@ def main():
             existing_results = []
 
     # --- Job Planning ---
-    server_jobs = [
-        {'type': 'custom', 'config': client_config}
-        for client_config in config.get('client_runs', [])
-        if 'server_config' in config
-    ]
-    
     all_planned_jobs = []
     for run_config in config.get('standalone_runs', []):
         if run_config.get('mode') != 'vllm_throughput':
@@ -513,19 +454,25 @@ def main():
         json.dump(final_summary_list, f, indent=4)
     print(f"✅ Summary report updated at '{report_filepath}' with {len(all_planned_jobs)} total runs.")
 
-    # --- Filter out completed jobs ---
+    # Filter out completed jobs
     standalone_jobs = [job for job in all_planned_jobs if job['config']['name'] not in completed_runs]
     
     # Sort standalone jobs by tensor parallel size (ascending)
     standalone_jobs.sort(key=lambda j: j['config'].get('tensor_parallel_size', 1))
     
-    all_jobs_to_run = standalone_jobs + server_jobs
-    if not all_jobs_to_run:
+    if not standalone_jobs:
         print("No new benchmark runs to execute.")
         return
 
     # --- Print Run Plan ---
-    print_run_plan(all_jobs_to_run)
+    print_run_plan(standalone_jobs)
+
+    # --- Prompt for confirmation if the flag is set ---
+    if args.prompt_for_confirmation:
+        response = input("Continue with the benchmark execution? (y/n): ").lower()
+        if response != 'y':
+            print("Benchmark execution cancelled by user.")
+            return
 
     # --- Execute Standalone Jobs in Parallel ---
     num_gpus = get_gpu_count()
@@ -552,41 +499,6 @@ def main():
                 except Exception as exc:
                     print(f"🚨 Job '{job['config']['name']}' generated an exception: {exc}")
                     update_summary_file(report_filepath, {"run_name": job['config']['name'], "status": "EXCEPTION"})
-
-    # --- Execute Server/Client Jobs Sequentially ---
-    if server_jobs:
-        print("\n" + "#"*80)
-        print(f"# Running {len(server_jobs)} server/client jobs sequentially.")
-        print("#"*80)
-        
-        server_process = None
-        try:
-            # Start the server once
-            server_args = shlex.split(config['server_config'].get('server_args', ''))
-            server_process = subprocess.Popen(['./start_server.sh'] + server_args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=os.setsid)
-            log_thread = threading.Thread(target=stream_and_capture_output, args=(server_process.stdout, "SERVER", []), daemon=True)
-            log_thread.start()
-            
-            if not wait_for_server(SERVER_STARTUP_TIMEOUT):
-                print("🚨 Server failed to start. Cannot run custom benchmarks.")
-            else:
-                # Run all client benchmarks against the single server
-                for i, job in enumerate(server_jobs):
-                    run_counter = len(standalone_jobs) + i + 1
-                    
-                    # Mark the job as RUNNING before execution
-                    report_filepath = os.path.join(args.output_dir, "summary_report.json")
-                    update_summary_file(report_filepath, {"run_name": job['config'].get('name')}, status="RUNNING")
-                    
-                    result = run_client_benchmark(job['config'], run_counter, logs_dir)
-                    if result:
-                        update_summary_file(report_filepath, result)
-        finally:
-            if server_process and server_process.poll() is None:
-                print("\n" + "="*80)
-                print("🛑 Shutting down server.")
-                os.killpg(os.getpgid(server_process.pid), signal.SIGTERM)
-                server_process.wait(timeout=PROCESS_CLEANUP_TIMEOUT)
 
     print("\n" + "#"*80)
     print(f"✅ All benchmark runs complete. Final report is at '{report_filepath}'")

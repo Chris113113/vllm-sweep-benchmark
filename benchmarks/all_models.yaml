@@ -1,0 +1,172 @@
+# ==============================================================================
+# VLLM Automated Benchmark Configuration for Ironwood Workloads
+# ==============================================================================
+#
+# This file defines a suite of standalone benchmark runs using the official
+# vLLM benchmark script (benchmarks/benchmark_throughput.py), based on the
+# workloads defined in DESIGN.md.
+#
+# Configurations are grouped by model and prefix length to reduce redundancy.
+
+standalone_runs:
+
+  # ==============================================================================
+  # Llama-3.3-70B-Instruct
+  # ==============================================================================
+  # - name: "Llama-3.3-70B-Instruct"
+  #   mode: "vllm_throughput"
+  #   tensor_parallel_sizes: [1, 2, 4, 8]
+  #   args: >
+  #     --model "meta-llama/Llama-3.3-70B-Instruct"
+  #     --num-prompts 1000
+  #     --gpu-memory-utilization 0.9
+  #     --quantization fp8
+  #     --dtype auto
+  #   length_configs:
+  #     - { input_len: 2048, output_len: 8192, prefix_len: 0 }
+  #     - { input_len: 1024, output_len: 4096, prefix_len: 0 }
+  #     - { input_len: 1024, output_len: 1024, prefix_len: 0 }
+  #     - { input_len: 8192, output_len: 2048, prefix_len: 7900 }
+  #     - { input_len: 2048, output_len: 256, prefix_len: 1800 }
+  #     - { input_len: 4096, output_len: 256, prefix_len: 1800 }
+
+  # # ==============================================================================
+  # # Llama-3.1-8B-Instruct
+  # # ==============================================================================
+  # - name: "Llama-3.1-8B-Instruct"
+  #   mode: "vllm_throughput"
+  #   tensor_parallel_sizes: [1, 2, 4, 8]
+  #   args: >
+  #     --model "meta-llama/Llama-3.1-8B-Instruct"
+  #     --num-prompts 1000
+  #     --gpu-memory-utilization 0.9
+  #     --quantization fp8
+  #     --dtype auto
+  #   length_configs:
+  #     - { input_len: 2048, output_len: 8192, prefix_len: 0 }
+  #     - { input_len: 1024, output_len: 4096, prefix_len: 0 }
+  #     - { input_len: 1024, output_len: 1024, prefix_len: 0 }
+  #     - { input_len: 8192, output_len: 2048, prefix_len: 7900 }
+  #     - { input_len: 2048, output_len: 256, prefix_len: 1800 }
+  #     - { input_len: 4096, output_len: 256, prefix_len: 1800 }
+
+  # ==============================================================================
+  # Gemma-3-27B-IT
+  # ==============================================================================
+  # Flash-infer does not work on Gemma in current vLLM release, need to run separately.
+  - name: "Gemma-3-27B-IT"
+    mode: "vllm_throughput"
+    tensor_parallel_sizes: [1, 2, 4]
+    args: >
+      --model "google/gemma-3-27b-it"
+      --num-prompts 1000
+      --gpu-memory-utilization 0.9
+      --quantization fp8
+      --dtype auto
+    length_configs:
+      - { input_len: 2048, output_len: 8192, prefix_len: 0 }
+      - { input_len: 1024, output_len: 4096, prefix_len: 0 }
+      - { input_len: 1024, output_len: 1024, prefix_len: 0 }
+      - { input_len: 8192, output_len: 2048, prefix_len: 7900 }
+      - { input_len: 2048, output_len: 256, prefix_len: 1800 }
+      - { input_len: 4096, output_len: 256, prefix_len: 1800 }
+
+  # ==============================================================================
+  # Qwen3-32B
+  # ==============================================================================
+  # - name: "Qwen3-32B"
+  #   mode: "vllm_throughput"
+  #   tensor_parallel_sizes: [1, 2, 4, 8]
+  #   args: >
+  #     --model "Qwen/Qwen3-32B"
+  #     --num-prompts 1000
+  #     --gpu-memory-utilization 0.9
+  #     --quantization fp8
+  #     --dtype auto
+  #   length_configs:
+  #     - { input_len: 2048, output_len: 8192, prefix_len: 0 }
+  #     - { input_len: 1024, output_len: 4096, prefix_len: 0 }
+  #     - { input_len: 1024, output_len: 1024, prefix_len: 0 }
+  #     - { input_len: 8192, output_len: 2048, prefix_len: 7900 }
+  #     - { input_len: 2048, output_len: 256, prefix_len: 1800 }
+  #     - { input_len: 4096, output_len: 256, prefix_len: 1800 }
+
+  # # ==============================================================================
+  # # Qwen3-4B
+  # # ==============================================================================
+  # - name: "Qwen3-4B"
+  #   mode: "vllm_throughput"
+  #   tensor_parallel_sizes: [1, 2, 4]
+  #   args: >
+  #     --model "Qwen/Qwen3-4B"
+  #     --num-prompts 1000
+  #     --gpu-memory-utilization 0.9
+  #     --quantization fp8
+  #     --dtype auto
+  #   length_configs:
+  #     - { input_len: 2048, output_len: 8192, prefix_len: 0 }
+  #     - { input_len: 1024, output_len: 4096, prefix_len: 0 }
+  #     - { input_len: 1024, output_len: 1024, prefix_len: 0 }
+  #     - { input_len: 8192, output_len: 2048, prefix_len: 7900 }
+  #     - { input_len: 2048, output_len: 256, prefix_len: 1800 }
+  #     - { input_len: 4096, output_len: 256, prefix_len: 1800 }
+
+  # ==============================================================================
+  # Llama-4-Maverick-17B-128E-Instruct
+  # ==============================================================================
+  # - name: "Llama-4-Maverick-17B-128E-Instruct"
+  #   mode: "vllm_throughput"
+  #   tensor_parallel_sizes: [8]
+  #   args: >
+  #     --model "meta-llama/Llama-4-Maverick-17B-128E-Instruct"
+  #     --num-prompts 1000
+  #     --gpu-memory-utilization 0.9
+  #     --quantization fp8
+  #     --dtype auto
+  #   length_configs:
+  #     - { input_len: 2048, output_len: 8192, prefix_len: 0 }
+  #     - { input_len: 1024, output_len: 4096, prefix_len: 0 }
+  #     - { input_len: 1024, output_len: 1024, prefix_len: 0 }
+  #     - { input_len: 8192, output_len: 2048, prefix_len: 7900 }
+  #     - { input_len: 2048, output_len: 256, prefix_len: 1800 }
+  #     - { input_len: 4096, output_len: 256, prefix_len: 1800 }
+
+  # ==============================================================================
+  # DeepSeek-R1
+  # ==============================================================================
+  # - name: "DeepSeek-R1"
+  #   mode: "vllm_throughput"
+  #   tensor_parallel_sizes: [8]
+  #   args: >
+  #     --model "deepseek-ai/DeepSeek-R1"
+  #     --num-prompts 1000
+  #     --gpu-memory-utilization 0.9
+  #     --quantization fp8
+  #     --dtype auto
+  #   length_configs:
+  #     - { input_len: 2048, output_len: 8192, prefix_len: 0 }
+  #     - { input_len: 1024, output_len: 4096, prefix_len: 0 }
+  #     - { input_len: 1024, output_len: 1024, prefix_len: 0 }
+  #     - { input_len: 8192, output_len: 2048, prefix_len: 7900 }
+  #     - { input_len: 2048, output_len: 256, prefix_len: 1800 }
+  #     - { input_len: 4096, output_len: 256, prefix_len: 1800 }
+
+  # ==============================================================================
+  # Llama-Guard-4-12B
+  # ==============================================================================
+  # - name: "Llama-Guard-4-12B"
+  #   mode: "vllm_throughput"
+  #   tensor_parallel_sizes: [1, 2, 4]
+  #   args: >
+  #     --model "meta-llama/Llama-Guard-4-12B"
+  #     --num-prompts 1000
+  #     --gpu-memory-utilization 0.9
+  #     --quantization fp8
+  #     --dtype auto
+  #   length_configs:
+  #     - { input_len: 2048, output_len: 8192, prefix_len: 0 }
+  #     - { input_len: 1024, output_len: 4096, prefix_len: 0 }
+  #     - { input_len: 1024, output_len: 1024, prefix_len: 0 }
+  #     - { input_len: 8192, output_len: 2048, prefix_len: 7900 }
+  #     - { input_len: 2048, output_len: 256, prefix_len: 1800 }
+  #     - { input_len: 4096, output_len: 256, prefix_len: 1800 }

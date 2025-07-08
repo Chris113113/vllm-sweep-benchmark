@@ -1,0 +1,12 @@
+standalone_runs:
+- name: "Llama-3.1-8B-Instruct"
+  mode: "vllm_throughput"
+  tensor_parallel_sizes: [1, 2]
+  args: >
+    --model "meta-llama/Llama-3.1-8B-Instruct"
+    --num-prompts 10
+    --gpu-memory-utilization 0.9
+    --quantization fp8
+    --dtype auto
+  length_configs:
+    - { input_len: 128, output_len: 128, prefix_len: 0 }

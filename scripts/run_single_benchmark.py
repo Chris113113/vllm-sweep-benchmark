@@ -12,7 +12,7 @@ import io
 from datetime import datetime
 
 # --- Configuration ---
-VLLM_BENCHMARK_SCRIPT_PATH = "vllm-repo-benchmark/benchmarks/benchmark_vllm_throughput.py"
+VLLM_BENCHMARK_SCRIPT_PATH = "scripts/vllm-repo-benchmark/benchmarks/benchmark_vllm_throughput.py"
 FATAL_ERROR_STRINGS = ["EngineCore failed to start."]
 RETRYABLE_ERROR_STRINGS = ["uncorrectable NVLink error"]
 PROCESS_CLEANUP_TIMEOUT = 15
@@ -122,22 +122,22 @@ def run_vllm_throughput_benchmark(run_config, run_index, logs_dir, gpu_ids=None)
         return {"run_name": run_name, "status": "RETRYABLE_ERROR"}
     results = {}
     status = "FAILED"
-    throughput_match = re.search(r"Throughput: ([\\d.]+) requests/s, ([\\d.]+) total tokens/s, ([\\d.]+) output tokens/s", full_output)
+    throughput_match = re.search(r"Throughput: ([\d.]+) requests/s, ([\d.]+) total tokens/s, ([\d.]+) output tokens/s", full_output)
     if throughput_match:
         results["throughput_req_per_sec"] = float(throughput_match.group(1))
         results["throughput_total_tokens_per_sec"] = float(throughput_match.group(2))
         results["throughput_output_tokens_per_sec"] = float(throughput_match.group(3))
         status = "SUCCESS"
-    ttft_avg_match = re.search(r"Average TTFT \\(s\\): ([\\d.]+)", full_output)
+    ttft_avg_match = re.search(r"Average TTFT \(s\): ([\d.]+)", full_output)
     if ttft_avg_match:
         results["avg_ttft_s"] = float(ttft_avg_match.group(1))
-    ttft_p99_match = re.search(r"P99 TTFT \\(s\\): ([\\d.]+)", full_output)
+    ttft_p99_match = re.search(r"P99 TTFT \(s\): ([\d.]+)", full_output)
     if ttft_p99_match:
         results["p99_ttft_s"] = float(ttft_p99_match.group(1))
-    tpot_avg_match = re.search(r"Average TPOT \\(tokens/s\\): ([\\d.]+)", full_output)
+    tpot_avg_match = re.search(r"Average TPOT \(tokens/s\): ([\d.]+)", full_output)
     if tpot_avg_match:
         results["avg_tpot_tokens_per_s"] = float(tpot_avg_match.group(1))
-    tpot_p99_match = re.search(r"P99 TPOT \\(tokens/s\\): ([\\d.]+)", full_output)
+    tpot_p99_match = re.search(r"P99 TPOT \(tokens/s\): ([\d.]+)", full_output)
     if tpot_p99_match:
         results["p99_tpot_tokens_per_s"] = float(tpot_p99_match.group(1))
     for line in full_output.splitlines():
@@ -150,7 +150,7 @@ def main():
     parser.add_argument("--run-name", required=True, help="A descriptive name for the benchmark run.")
     parser.add_argument("--output-dir", default=f"benchmark_results_{int(time.time())}", help="Directory to save the final results and logs.")
     parser.add_argument("--gpu-ids", help="Comma-separated list of GPU IDs to use.")
-    parser.add_argument('benchmark_args', nargs=argparse.REMAINDER, help="Arguments to pass to the vLLM benchmark script.")
+    parser.add_argument('benchmark_args', nargs='*', help="Arguments to pass to the vLLM benchmark script.")
     args = parser.parse_args()
 
     os.makedirs(args.output_dir, exist_ok=True)

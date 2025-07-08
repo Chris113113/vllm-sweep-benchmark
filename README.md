@@ -81,7 +81,7 @@ standalone_runs:
 Execute the `run_automated_benchmark.py` script, passing the path to your configuration file.
 
 ```bash
-python run_automated_benchmark.py benchmarks/full_run.yaml --output-dir ./my_benchmark_results
+python scripts/run_automated_benchmark.py benchmarks/full_run.yaml --output-dir ./my_benchmark_results
 ```
 
 ### 3. Review the Output
@@ -111,7 +111,7 @@ my_benchmark_results/
 If you want to re-run the visualization on an existing report, you can use the offline script:
 
 ```bash
-python visualize_result.py ./my_benchmark_results/summary_report.json
+python scripts/visualize_result.py ./my_benchmark_results/summary_report.json
 ```
 
 This will generate new visualizations inside the output directory.

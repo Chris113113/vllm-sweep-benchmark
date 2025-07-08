@@ -43,6 +43,25 @@ The suite is designed to measure the raw generation (decoding) throughput of a m
     pip install -r requirements.txt
     ```
 
+## Environment Setup
+
+Before running the benchmarks, it's crucial to configure your environment, especially for downloading models from the Hugging Face Hub.
+
+Set the following environment variables in your shell. You can add them to your `.bashrc` or `.zshrc` file for persistence.
+
+```bash
+# (Required) Replace with your own Hugging Face access token
+export HF_TOKEN="hf_YOUR_ACCESS_TOKEN_HERE"
+
+# (Recommended) Set a custom cache directory to avoid re-downloading models
+export HF_HOME=/path/to/your/cache/
+export HF_HUB_CACHE=/path/to/your/cache/
+export VLLM_CACHE_ROOT=/path/to/your/cache/
+```
+
+- `HF_TOKEN`: Your personal Hugging Face access token, required for downloading gated models.
+- `HF_HOME`, `HF_HUB_CACHE`, `VLLM_CACHE_ROOT`: These variables control where Hugging Face and vLLM store cached models and data. Setting them to a persistent, high-speed storage location (like an SSD or NVMe drive) is highly recommended to speed up initialization and avoid repeated downloads.
+
 ## Usage
 
 The primary workflow involves two steps: configuring your benchmark suite and running the orchestrator.

@@ -1,0 +1,24 @@
+# Use the vllm-openai base image
+FROM vllm/vllm-openai:v0.9.1
+
+# Switch to root user to install dependencies
+USER root
+
+# Install git and vim
+RUN apt-get update && apt-get install -y git vim
+
+# Create a non-root user and switch to it
+RUN useradd -m -d /home/vllm -s /bin/bash vllm
+USER vllm
+
+# Set the working directory
+WORKDIR /home/vllm/vllm-sweep-benchmark
+
+# Copy the entire project directory into the container
+COPY . .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Set the entrypoint
+ENTRYPOINT ["python", "run_automated_benchmark.py"]

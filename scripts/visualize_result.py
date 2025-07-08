@@ -166,7 +166,6 @@ def main():
     parser.add_argument("summary_file", help="Path to the summary_report.json file.")
     args = parser.parse_args()
     
-    # --- FIX: Use 'output_path' consistently ---
     output_path = os.path.dirname(args.summary_file)
     if not output_path: output_path = "."
 
@@ -224,7 +223,6 @@ def main():
     for model_identifier, group_df in successful_runs_df.groupby(model_col):
         print(f"--- Generating plots for group: {model_identifier} ---")
         
-        # --- FIX: Use 'output_path' consistently ---
         model_output_path = os.path.join(output_path, sanitize_filename(model_identifier))
         os.makedirs(model_output_path, exist_ok=True)
         

@@ -210,61 +210,7 @@ def execute_and_monitor_process(command, job_name, log_prefix, logs_dir, log_fil
 
 
 # --- Benchmark Execution Functions ---
-def run_vllm_throughput_benchmark(run_config, run_index, logs_dir, gpu_ids=None):
-    run_name = run_config.get('name', f'vLLM_Official_Run_{run_index}')
-    args_list = shlex.split(run_config.get('args', ''))
-    
-    print("\n" + "-"*80)
-    print(f"🏁 ({run_index}) Running Official vLLM Throughput Benchmark: '{run_name}' on GPUs {gpu_ids}")
-    
-    command = ['python', VLLM_BENCHMARK_SCRIPT_PATH] + args_list
-    log_filename = f"{run_index}_{sanitize_filename(run_name)}_vllm_script.log"
 
-    full_output, exec_status = execute_and_monitor_process(
-        command, run_name, "VLLM_BENCH", logs_dir, log_filename, 
-        gpu_ids=gpu_ids,
-        fatal_error_strings=FATAL_ERROR_STRINGS,
-        retryable_error_strings=RETRYABLE_ERROR_STRINGS
-    )
-
-    if exec_status == "fatal_error":
-        return {"run_name": run_name, "status": "TERMINATED_DUE_TO_FATAL_ERROR"}
-    if exec_status == "retryable_error":
-        return {"run_name": run_name, "status": "RETRYABLE_ERROR"}
-
-    results = {}
-    status = "FAILED"
-    throughput_match = re.search(r"Throughput: ([\d.]+) requests/s, ([\d.]+) total tokens/s, ([\d.]+) output tokens/s", full_output)
-    if throughput_match:
-        results["throughput_req_per_sec"] = float(throughput_match.group(1))
-        results["throughput_total_tokens_per_sec"] = float(throughput_match.group(2))
-        results["throughput_output_tokens_per_sec"] = float(throughput_match.group(3))
-        status = "SUCCESS"
-
-    # Parse new metrics
-    ttft_avg_match = re.search(r"Average TTFT \(s\): ([\d.]+)", full_output)
-    if ttft_avg_match:
-        results["avg_ttft_s"] = float(ttft_avg_match.group(1))
-    ttft_p99_match = re.search(r"P99 TTFT \(s\): ([\d.]+)", full_output)
-    if ttft_p99_match:
-        results["p99_ttft_s"] = float(ttft_p99_match.group(1))
-    tpot_avg_match = re.search(r"Average TPOT \(tokens/s\): ([\d.]+)", full_output)
-    if tpot_avg_match:
-        results["avg_tpot_tokens_per_s"] = float(tpot_avg_match.group(1))
-    tpot_p99_match = re.search(r"P99 TPOT \(tokens/s\): ([\d.]+)", full_output)
-    if tpot_p99_match:
-        results["p99_tpot_tokens_per_s"] = float(tpot_p99_match.group(1))
-
-    for line in full_output.splitlines():
-        if "Total num prompt tokens:" in line: results["total_prompt_tokens"] = int(line.split(":")[1].strip())
-        if "Total num output tokens:" in line: results["total_output_tokens"] = int(line.split(":")[1].strip())
-
-    return {
-        "run_name": run_name, "mode": "vllm_throughput",
-        "config": {arg.strip('-'): val for arg, val in zip(args_list[::2], args_list[1::2])},
-        "results": results, "client_log_file": log_filename,
-        "status": status
-    }
 
 
 def update_summary_file(filepath, new_result, status=None):

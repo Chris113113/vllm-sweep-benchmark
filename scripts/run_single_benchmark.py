@@ -113,7 +113,7 @@ def run_vllm_throughput_benchmark(run_config, run_index, logs_dir, gpu_ids=None)
     args_list = shlex.split(run_config.get('args', ''))
     print("\n" + "-"*80)
     print(f"🏁 ({run_index}) Running Official vLLM Throughput Benchmark: '{run_name}' on GPUs {gpu_ids}")
-    command = ['python', VLLM_BENCHMARK_SCRIPT_PATH] + args_list
+    command = [sys.executable, VLLM_BENCHMARK_SCRIPT_PATH] + args_list
     log_filename = f"{run_index}_{sanitize_filename(run_name)}_vllm_script.log"
     full_output, exec_status = execute_and_monitor_process(command, run_name, "VLLM_BENCH", logs_dir, log_filename, gpu_ids=gpu_ids, fatal_error_strings=FATAL_ERROR_STRINGS, retryable_error_strings=RETRYABLE_ERROR_STRINGS)
     if exec_status == "fatal_error":

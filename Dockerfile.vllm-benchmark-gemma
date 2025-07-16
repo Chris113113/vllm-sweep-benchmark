@@ -1,0 +1,21 @@
+# Use the vllm-openai base image
+FROM vllm/vllm-openai:latest
+
+# Switch to root user to install dependencies
+USER root
+
+# Install git and vim
+RUN apt-get update && apt-get install -y git vim
+
+# Set the working directory
+WORKDIR /home/vllm/vllm-sweep-benchmark
+
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install tokenizers==0.21.0
+RUN pip uninstall -y flashinfer-python
+
+# Set the entrypoint
+ENTRYPOINT [ "/bin/bash" ]
